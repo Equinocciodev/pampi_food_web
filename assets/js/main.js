@@ -12,6 +12,7 @@
   const links = document.getElementById("navLinks");
   const setMenu = (open) => {
     links.classList.toggle("is-open", open);
+    nav.classList.toggle("menu-open", open);
     burger.setAttribute("aria-expanded", String(open));
     document.body.style.overflow = open ? "hidden" : "";
   };
