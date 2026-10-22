@@ -33,7 +33,6 @@
     const h = label.clientHeight;
     if (!r || !h) return;
     const labelW = h * IMG_RATIO;
-    const C = 2 * Math.PI * r;
     const step = Math.PI / STRIPS;
     const arc = r * step;
 
@@ -48,12 +47,12 @@
       el.style.left = x0 + "px";
       el.style.width = arc + "px";
       el.style.backgroundSize = `${labelW}px ${h}px`;
-      el.style.transform = `scaleX(${(x1 - x0 + 0.6) / arc})`;
+      el.style.transform = `scaleX(${(x1 - x0 + 1.2) / arc})`;
       label.appendChild(el);
       strips.push({ el, s: r * (t0 + Math.PI / 2) });
     }
     const first = !geo;
-    geo = { r, C, labelW };
+    geo = { r, labelW };
     // al inicio, el logo "Pampi" queda de frente
     if (first) offset = 0.475 * labelW - (r * Math.PI) / 2 - arc / 2;
     paint();
@@ -61,7 +60,8 @@
 
   function paint() {
     if (!geo) return;
-    const { C } = geo;
+    // la etiqueta da exactamente una vuelta: el final empalma con el inicio
+    const C = geo.labelW;
     for (const st of strips) {
       const u = (((offset + st.s) % C) + C) % C;
       st.el.style.backgroundPosition = `${-u}px 0`;

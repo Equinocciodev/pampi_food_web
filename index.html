@@ -70,10 +70,45 @@
         <div class="hero__jar">
           <div class="jar-stage" id="jarStage" title="Arrastra para girar">
             <div class="jar">
-              <div class="jar__lid"><span></span></div>
-              <div class="jar__neck"></div>
-              <div class="jar__body">
-                <div class="jar__sauce"></div>
+              <svg class="jar__glass" viewBox="0 0 100 280" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="sauceFill" x1="0" x2="1" y1="0" y2="0">
+                    <stop offset="0" stop-color="#7A0A10"/>
+                    <stop offset=".18" stop-color="#B3121A"/>
+                    <stop offset=".42" stop-color="#D42A22"/>
+                    <stop offset=".7" stop-color="#C21A1F"/>
+                    <stop offset="1" stop-color="#6A070D"/>
+                  </linearGradient>
+                  <linearGradient id="glassShine" x1="0" x2="1" y1="0" y2="0">
+                    <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+                    <stop offset=".12" stop-color="#fff" stop-opacity="0"/>
+                    <stop offset=".17" stop-color="#fff" stop-opacity=".55"/>
+                    <stop offset=".22" stop-color="#fff" stop-opacity=".08"/>
+                    <stop offset=".8" stop-color="#fff" stop-opacity="0"/>
+                    <stop offset=".86" stop-color="#fff" stop-opacity=".22"/>
+                    <stop offset=".9" stop-color="#fff" stop-opacity="0"/>
+                  </linearGradient>
+                  <radialGradient id="pulp" cx=".45" cy=".3" r=".6">
+                    <stop offset="0" stop-color="#FF6B4E" stop-opacity=".45"/>
+                    <stop offset="1" stop-color="#FF6B4E" stop-opacity="0"/>
+                  </radialGradient>
+                  <filter id="pulpNoise" x="0" y="0" width="100%" height="100%">
+                    <feTurbulence type="fractalNoise" baseFrequency=".9 .35" numOctaves="2" seed="4"/>
+                    <feColorMatrix values="0 0 0 0 .35  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.1 1.05"/>
+                  </filter>
+                  <clipPath id="bottleClip"><use href="#bottleShape"/></clipPath>
+                  <path id="bottleShape" d="M18,14 L82,14 L82,28 C82,52 100,62 100,100 L100,264 Q100,280 84,280 L16,280 Q0,280 0,264 L0,100 C0,62 18,52 18,28 Z"/>
+                </defs>
+                <use href="#bottleShape" fill="url(#sauceFill)"/>
+                <use href="#bottleShape" fill="url(#pulp)"/>
+                <rect width="100" height="280" filter="url(#pulpNoise)" clip-path="url(#bottleClip)" opacity=".35"/>
+                <rect x="18" y="14" width="64" height="9" fill="#F5C6B8" opacity=".35"/>
+                <path d="M18,23 L82,23" stroke="#8C0B12" stroke-width="1.2" opacity=".5"/>
+                <use href="#bottleShape" fill="url(#glassShine)"/>
+                <use href="#bottleShape" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width=".8" vector-effect="non-scaling-stroke"/>
+              </svg>
+              <div class="jar__cap"></div>
+              <div class="jar__band">
                 <div class="jar__label" id="jarLabel"></div>
                 <div class="jar__shade"></div>
                 <div class="jar__gloss"></div>
@@ -81,7 +116,7 @@
             </div>
             <div class="jar__shadow"></div>
           </div>
-          <p class="jar-hint"><span>↔</span> Arrastra para girar el frasco</p>
+          <p class="jar-hint"><span>↔</span> Arrastra para girar la botella</p>
         </div>
       </div>
 
