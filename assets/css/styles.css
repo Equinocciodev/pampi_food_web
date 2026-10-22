@@ -91,6 +91,7 @@ body::before {
   color: var(--ink-soft);
   margin-bottom: 22px;
 }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--red-2); box-shadow: 0 0 0 4px rgba(215,38,30,.16); }
 .flag {
   width: 36px; height: 4px; border-radius: 2px;
   background: linear-gradient(90deg, #1E8C45 0 33.3%, #fff 33.3% 66.6%, var(--red-2) 66.6%);
@@ -203,6 +204,11 @@ body::before {
   opacity: 0; animation: fade 1s .5s var(--ease) forwards;
 }
 .hero__actions { display: flex; flex-wrap: wrap; gap: 14px; margin: 34px 0 44px; opacity: 0; animation: fade 1s .7s var(--ease) forwards; }
+.hero__note {
+  font-size: 12px; letter-spacing: .2em; text-transform: uppercase; font-weight: 700;
+  color: var(--red); margin: 0 0 12px;
+  opacity: 0; animation: fade 1s .85s var(--ease) forwards;
+}
 .hero__badges {
   list-style: none; padding: 0; margin: 0;
   display: flex; gap: 36px; flex-wrap: wrap;
@@ -611,10 +617,11 @@ body::before {
   transition: transform 1.2s var(--ease), filter .6s;
   pointer-events: none;
 }
+.item img[src*="atun"] { object-position: 50% 75%; }
 .item:not(.item--now) img { filter: saturate(.92); }
 .item::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(180deg, rgba(20,16,14,0) 56%, rgba(20,16,14,.8) 78%, rgba(20,16,14,.96) 100%);
+  background: linear-gradient(180deg, rgba(20,16,14,0) 50%, rgba(20,16,14,.86) 74%, rgba(20,16,14,.96) 100%);
 }
 .item:hover { transform: translateY(-10px); }
 .item:hover img { transform: scale(1.06); filter: none; }
