@@ -181,5 +181,26 @@
   });
   window.addEventListener("pointerup", () => { sDown = false; shelf.classList.remove("is-dragging"); });
 
+  /* ---------- Filtros de la despensa ---------- */
+  const chips = document.querySelectorAll(".chip");
+  const items = document.querySelectorAll(".item");
+  chips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      chips.forEach((c) => c.classList.toggle("is-active", c === chip));
+      const f = chip.dataset.filter;
+      items.forEach((it, i) => {
+        const show = f === "all" || it.dataset.cat === f;
+        it.hidden = !show;
+        it.classList.remove("is-entering");
+        if (show) {
+          void it.offsetWidth;
+          it.style.animationDelay = (i % 6) * 0.05 + "s";
+          it.classList.add("is-entering");
+        }
+      });
+      shelf.scrollTo({ left: 0, behavior: "smooth" });
+    });
+  });
+
   document.getElementById("year").textContent = new Date().getFullYear();
 })();

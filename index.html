@@ -158,48 +158,20 @@
 
         <div class="origin__visual reveal">
           <div class="postcard">
-            <svg class="vesuvio" viewBox="0 0 600 420" aria-hidden="true">
-              <defs>
-                <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stop-color="#F7C873"/>
-                  <stop offset="0.6" stop-color="#F3A35C"/>
-                  <stop offset="1" stop-color="#E9795A"/>
-                </linearGradient>
-                <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stop-color="#3F6E8C"/>
-                  <stop offset="1" stop-color="#22465E"/>
-                </linearGradient>
-              </defs>
-              <rect width="600" height="420" fill="url(#sky)"/>
-              <circle class="sun" cx="430" cy="150" r="58" fill="#FFF1C9" opacity=".95"/>
-              <path d="M0 300 L150 210 L215 170 Q240 150 262 168 L285 160 Q300 152 318 170 L420 240 L600 300 L600 420 L0 420 Z" fill="#7A3B33"/>
-              <path d="M0 315 L130 250 L220 205 Q250 190 280 205 L360 240 L600 320 L600 420 L0 420Z" fill="#5E2B27" opacity=".7"/>
-              <path class="smoke" d="M262 150 q-10 -30 10 -50 q20 -20 5 -50" stroke="#fff" stroke-width="10" fill="none" stroke-linecap="round" opacity=".55"/>
-              <rect y="330" width="600" height="90" fill="url(#sea)"/>
-              <g class="waves" stroke="#9CC1D6" stroke-width="2" fill="none" opacity=".6">
-                <path d="M30 355 q15 -6 30 0 t30 0"/>
-                <path d="M200 375 q15 -6 30 0 t30 0"/>
-                <path d="M420 360 q15 -6 30 0 t30 0"/>
-                <path d="M500 395 q15 -6 30 0 t30 0"/>
-                <path d="M90 400 q15 -6 30 0 t30 0"/>
-              </g>
-              <!-- campo de tomates -->
-              <g transform="translate(0,300)">
-                <path d="M0 40 Q150 10 300 30 T600 25 L600 120 L0 120Z" fill="#2E6B34"/>
-                <g fill="#D7261E">
-                  <circle cx="60" cy="48" r="7"/><circle cx="76" cy="54" r="6"/><circle cx="140" cy="42" r="7"/>
-                  <circle cx="210" cy="50" r="6"/><circle cx="228" cy="44" r="7"/><circle cx="330" cy="46" r="7"/>
-                  <circle cx="400" cy="52" r="6"/><circle cx="470" cy="42" r="7"/><circle cx="540" cy="50" r="6"/>
-                  <circle cx="110" cy="70" r="7"/><circle cx="280" cy="72" r="7"/><circle cx="450" cy="74" r="6"/><circle cx="570" cy="78" r="7"/>
-                </g>
-              </g>
-            </svg>
+            <img class="postcard__photo" src="assets/img/origen/vesuvio-golfo.jpg" alt="El Vesuvio visto desde el golfo de Nápoles" width="1400" height="1050" loading="lazy">
             <div class="postcard__stamp">
               <span>Cercola</span>
               <small>Napoli · IT</small>
             </div>
-            <p class="postcard__caption">Saluti da Cercola</p>
           </div>
+          <figure class="snap snap--a">
+            <img src="assets/img/origen/cosecha.jpg" alt="Manos sosteniendo un cuenco de tomates recién cosechados" width="800" height="533" loading="lazy">
+            <figcaption>La cosecha</figcaption>
+          </figure>
+          <figure class="snap snap--b">
+            <img src="assets/img/origen/tomates-rama.jpg" alt="Tomates maduros en rama" width="800" height="600" loading="lazy">
+            <figcaption>Maduros al sol</figcaption>
+          </figure>
         </div>
       </div>
     </section>
@@ -501,25 +473,100 @@
       <div class="pantry__head reveal">
         <p class="kicker kicker--light">05 — Próximamente</p>
         <h2 class="h2 h2--light">Una despensa,<br><em>muchas posibilidades.</em></h2>
-        <p class="pantry__lead">La Passata es solo el comienzo. Estamos preparando una familia de productos inspirados en la mesa italiana.</p>
+        <p class="pantry__lead">La Passata es solo el comienzo. Estamos preparando una familia de productos inspirados en la mesa italiana: tomates, salsas, pasta, aceites y todo lo que pide un buen aperitivo.</p>
+      </div>
+
+      <div class="chips" role="group" aria-label="Filtrar productos">
+        <button class="chip is-active" data-filter="all">Todo</button>
+        <button class="chip" data-filter="tomate">Tomate</button>
+        <button class="chip" data-filter="salsas">Salsas</button>
+        <button class="chip" data-filter="pasta">Pasta y arroz</button>
+        <button class="chip" data-filter="aceites">Aceites y balsámicos</button>
+        <button class="chip" data-filter="aperitivo">Aperitivo</button>
       </div>
 
       <div class="shelf" id="shelf">
         <div class="shelf__track">
-          <article class="item item--now">
+          <article class="item item--now" data-cat="tomate">
+            <img src="assets/img/productos/passata.jpg" alt="Passata Pampi" width="420" height="677" loading="lazy" draggable="false">
             <span class="item__tag">Disponible</span>
-            <h3>Passata</h3><p>Puré de tomate · 680 g</p>
-            <span class="item__n">01</span>
+            <div class="item__body"><span class="item__n">01</span><h3>Passata</h3><p>Puré de tomate · 680 g</p></div>
           </article>
-          <article class="item"><span class="item__tag">Pronto</span><h3>Tomates enteros y cortados</h3><p>Pelati, triturados y en cubos</p><span class="item__n">02</span></article>
-          <article class="item"><span class="item__tag">Pronto</span><h3>Salsas para pasta y pizza</h3><p>Recetas clásicas, listas para servir</p><span class="item__n">03</span></article>
-          <article class="item"><span class="item__tag">Pronto</span><h3>Pasta clásica</h3><p>Formatos de siempre</p><span class="item__n">04</span></article>
-          <article class="item"><span class="item__tag">Pronto</span><h3>Aceites</h3><p>Oliva para cocinar y aliñar</p><span class="item__n">05</span></article>
-          <article class="item"><span class="item__tag">Pronto</span><h3>Pestos y antipasti</h3><p>Para la mesa del aperitivo</p><span class="item__n">06</span></article>
-          <article class="item"><span class="item__tag">Pronto</span><h3>Aceitunas</h3><p>Naturales y aliñadas</p><span class="item__n">07</span></article>
-          <article class="item"><span class="item__tag">Pronto</span><h3>Balsámicos y trufa</h3><p>Pequeños lujos de despensa</p><span class="item__n">08</span></article>
-          <article class="item"><span class="item__tag">Pronto</span><h3>Arroz y granos</h3><p>Para risottos y más</p><span class="item__n">09</span></article>
-          <article class="item"><span class="item__tag">Pronto</span><h3>Harinas y sémolas</h3><p>Para pasta y pizza en casa</p><span class="item__n">10</span></article>
+          <article class="item" data-cat="tomate">
+            <img src="assets/img/productos/passata-albahaca.jpg" alt="Passata con albahaca Pampi" width="420" height="677" loading="lazy" draggable="false">
+            <span class="item__tag">Próximamente</span>
+            <div class="item__body"><span class="item__n">02</span><h3>Passata con albahaca</h3><p>Tomate y albahaca · 680 g</p></div>
+          </article>
+          <article class="item" data-cat="tomate">
+            <img src="assets/img/productos/tomates-pelados.jpg" alt="Tomates pelados Pampi" width="420" height="677" loading="lazy" draggable="false">
+            <span class="item__tag">Próximamente</span>
+            <div class="item__body"><span class="item__n">03</span><h3>Tomates pelados</h3><p>Enteros, para lento fuego · 400 g</p></div>
+          </article>
+          <article class="item" data-cat="tomate">
+            <img src="assets/img/productos/tomate-cubos.jpg" alt="Tomate en cubos Pampi" width="420" height="677" loading="lazy" draggable="false">
+            <span class="item__tag">Próximamente</span>
+            <div class="item__body"><span class="item__n">04</span><h3>Tomate en cubos</h3><p>Para sumar textura · 400 g</p></div>
+          </article>
+          <article class="item" data-cat="salsas">
+            <img src="assets/img/productos/salsa-albahaca.jpg" alt="Salsa de tomate y albahaca Pampi" width="420" height="677" loading="lazy" draggable="false">
+            <span class="item__tag">Próximamente</span>
+            <div class="item__body"><span class="item__n">05</span><h3>Salsa de tomate y albahaca</h3><p>Lista para la pasta · 400 g</p></div>
+          </article>
+          <article class="item" data-cat="salsas">
+            <img src="assets/img/productos/salsa-arrabbiata.jpg" alt="Salsa arrabbiata Pampi" width="420" height="677" loading="lazy" draggable="false">
+            <span class="item__tag">Próximamente</span>
+            <div class="item__body"><span class="item__n">06</span><h3>Salsa arrabbiata</h3><p>Con un toque picante · 400 g</p></div>
+          </article>
+          <article class="item" data-cat="salsas">
+            <img src="assets/img/productos/salsa-pizza.jpg" alt="Salsa para pizza Pampi" width="420" height="677" loading="lazy" draggable="false">
+            <span class="item__tag">Próximamente</span>
+            <div class="item__body"><span class="item__n">07</span><h3>Salsa para pizza</h3><p>La base de la margherita · 400 g</p></div>
+          </article>
+          <article class="item" data-cat="pasta">
+            <img src="assets/img/productos/spaghetti.jpg" alt="Spaghetti Pampi" width="420" height="677" loading="lazy" draggable="false">
+            <span class="item__tag">Próximamente</span>
+            <div class="item__body"><span class="item__n">08</span><h3>Spaghetti</h3><p>Pasta larga · 500 g</p></div>
+          </article>
+          <article class="item" data-cat="pasta">
+            <img src="assets/img/productos/fusilli.jpg" alt="Fusilli Pampi" width="420" height="677" loading="lazy" draggable="false">
+            <span class="item__tag">Próximamente</span>
+            <div class="item__body"><span class="item__n">09</span><h3>Fusilli</h3><p>Espirales para salsas y ensaladas · 500 g</p></div>
+          </article>
+          <article class="item" data-cat="pasta">
+            <img src="assets/img/productos/risotto.jpg" alt="Arroz para risotto Pampi" width="420" height="677" loading="lazy" draggable="false">
+            <span class="item__tag">Próximamente</span>
+            <div class="item__body"><span class="item__n">10</span><h3>Arroz para risotto</h3><p>Cremoso, al estilo italiano · 500 g</p></div>
+          </article>
+          <article class="item" data-cat="aceites">
+            <img src="assets/img/productos/aceite-oliva.jpg" alt="Aceite de oliva virgen extra Pampi" width="420" height="677" loading="lazy" draggable="false">
+            <span class="item__tag">Próximamente</span>
+            <div class="item__body"><span class="item__n">11</span><h3>Aceite de oliva virgen extra</h3><p>Para aliñar y cocinar · 750 ml</p></div>
+          </article>
+          <article class="item" data-cat="aceites">
+            <img src="assets/img/productos/balsamico.jpg" alt="Condimento balsámico Pampi" width="420" height="677" loading="lazy" draggable="false">
+            <span class="item__tag">Próximamente</span>
+            <div class="item__body"><span class="item__n">12</span><h3>Condimento balsámico</h3><p>Para ensaladas y carnes · 250 ml</p></div>
+          </article>
+          <article class="item" data-cat="aperitivo">
+            <img src="assets/img/productos/pesto-genovese.jpg" alt="Pesto genovese Pampi" width="420" height="677" loading="lazy" draggable="false">
+            <span class="item__tag">Próximamente</span>
+            <div class="item__body"><span class="item__n">13</span><h3>Pesto genovese</h3><p>Albahaca, para pastas y tostadas · 190 g</p></div>
+          </article>
+          <article class="item" data-cat="aperitivo">
+            <img src="assets/img/productos/pimientos-asados.jpg" alt="Pimientos asados Pampi" width="420" height="677" loading="lazy" draggable="false">
+            <span class="item__tag">Próximamente</span>
+            <div class="item__body"><span class="item__n">14</span><h3>Pimientos asados</h3><p>Para antipasti y bocadillos · 280 g</p></div>
+          </article>
+          <article class="item" data-cat="aperitivo">
+            <img src="assets/img/productos/aceitunas-verdes.jpg" alt="Aceitunas verdes Pampi" width="420" height="677" loading="lazy" draggable="false">
+            <span class="item__tag">Próximamente</span>
+            <div class="item__body"><span class="item__n">15</span><h3>Aceitunas verdes</h3><p>Con hueso, para el aperitivo</p></div>
+          </article>
+          <article class="item" data-cat="aperitivo">
+            <img src="assets/img/productos/aceitunas-negras.jpg" alt="Aceitunas negras Pampi" width="420" height="677" loading="lazy" draggable="false">
+            <span class="item__tag">Próximamente</span>
+            <div class="item__body"><span class="item__n">16</span><h3>Aceitunas negras</h3><p>Sin hueso, para pizzas y ensaladas</p></div>
+          </article>
         </div>
       </div>
       <p class="shelf__hint">← Desliza la despensa →</p>
@@ -569,6 +616,7 @@
         <p>Reg. San. M.P.P.S. Nº A-178.339</p>
       </div>
     </div>
+    <p class="footer__credits">Fotografías de Origen: Wikimedia Commons — “Vesuvio da via Nazario Sauro” (Dr.Conati, dominio público), “Tomato Garden” (Elaine Casap, CC0), “Tomatoes for sale” (Jeffery Martin, CC0).</p>
     <p class="footer__copy">© <span id="year">2026</span> Pampi Foods. Todos los derechos reservados.</p>
   </footer>
 
