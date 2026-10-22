@@ -4,7 +4,17 @@
 
   /* ---------- Navegación ---------- */
   const nav = document.getElementById("nav");
-  const onScroll = () => nav.classList.toggle("is-scrolled", window.scrollY > 40);
+  const root = document.documentElement;
+  const themeMeta = document.querySelector('meta[name="theme-color"]');
+  const onScroll = () => {
+    nav.classList.toggle("is-scrolled", window.scrollY > 40);
+    // el fondo del lienzo coincide con el footer al llegar abajo
+    const bottom = window.scrollY + window.innerHeight > root.scrollHeight / 2;
+    if (bottom !== root.classList.contains("is-bottom")) {
+      root.classList.toggle("is-bottom", bottom);
+      themeMeta.setAttribute("content", bottom ? "#1E1A17" : "#F5F0E6");
+    }
+  };
   onScroll();
   window.addEventListener("scroll", onScroll, { passive: true });
 

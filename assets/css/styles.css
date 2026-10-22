@@ -24,7 +24,9 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; overflow-x: clip; }
+html { scroll-behavior: smooth; overflow-x: clip; background: var(--cream); }
+/* en la mitad inferior el lienzo toma el color del footer (rebote de iOS y barra inferior) */
+html.is-bottom { background: var(--ink); }
 body {
   margin: 0;
   background: var(--cream);
@@ -666,7 +668,7 @@ body::before {
 /* =========================================================
    FOOTER
    ========================================================= */
-.footer { background: var(--ink); color: #CFC6BA; padding: 0 var(--gutter) 40px; }
+.footer { background: var(--ink); color: #CFC6BA; padding: 0 var(--gutter) calc(40px + env(safe-area-inset-bottom)); }
 .footer__brand { max-width: 1240px; margin: 0 auto; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,.1); }
 .footer__logo { font-family: var(--serif); font-weight: 900; font-size: clamp(64px, 10vw, 140px); color: var(--red-2); line-height: .9; letter-spacing: -.03em; }
 .footer__logo sup { font-size: .16em; font-family: var(--sans); color: #CFC6BA; vertical-align: top; }
