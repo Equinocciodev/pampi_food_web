@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PAMPI Catalog",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "id",
+      "slug",
+      "familyId",
+      "name",
+      "status",
+      "primaryImage",
+      "imageCoverage",
+      "publicVisible",
+      "approvalFlags"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "pattern": "^PAM-[A-Z]{2,3}-[0-9]{2}$"
+      },
+      "slug": {
+        "type": "string"
+      },
+      "familyId": {
+        "enum": [
+          "aceites",
+          "tomates",
+          "aceitunas",
+          "conservas",
+          "quesos",
+          "frutos-secos",
+          "tes-infusiones",
+          "mermeladas"
+        ]
+      },
+      "name": {
+        "type": "string",
+        "minLength": 1
+      },
+      "status": {
+        "enum": [
+          "concept",
+          "review",
+          "approved",
+          "archived"
+        ]
+      },
+      "primaryImage": {
+        "type": "string"
+      },
+      "imageCoverage": {
+        "enum": [
+          "individual",
+          "family"
+        ]
+      },
+      "publicVisible": {
+        "type": "boolean"
+      },
+      "approvalFlags": {
+        "type": "object",
+        "required": [
+          "commercial",
+          "technical",
+          "legal",
+          "artwork",
+          "imageRights"
+        ],
+        "additionalProperties": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

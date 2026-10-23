@@ -1,0 +1,15 @@
+{
+  "name": "pampi-web",
+  "private": true,
+  "type": "module",
+  "description": "Sitio estático PAMPI generado con Node (sin dependencias externas).",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "node build/build.mjs",
+    "build:staging": "STAGING=1 node build/build.mjs",
+    "check": "node build/check.mjs",
+    "check:links": "node build/check-links.mjs",
+    "images": "node build/images.mjs",
+    "serve": "node build/serve.mjs"
+  }
+}

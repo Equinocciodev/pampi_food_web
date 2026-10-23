@@ -1,0 +1,156 @@
+[
+  {
+    "id": "passata",
+    "path": "assets/passata.jpg",
+    "source_path": "output/pampi_etiquetas/ancla_passata/passata_envase.png",
+    "sha256": "d37c5e1a861d5a61a10fe53b09e22c8237d17e24512818d9b56cd60665073b73",
+    "width": 1536,
+    "height": 1024,
+    "provenance": "Concepto generado previamente para PAMPI, seleccionado de entregas existentes",
+    "license_status": "Uso de concepto en este encargo; validar derechos de marca, fotografía y arte maestro antes de publicación",
+    "print_ready": false
+  },
+  {
+    "id": "aceites",
+    "path": "assets/aceites.jpg",
+    "source_path": "output/pampi_etiquetas/ancla_passata/01_aceites.png",
+    "sha256": "1943ed3715c4a00caadcf3da076bf31348023ad1ef51e5a213499282bef6b473",
+    "width": 1536,
+    "height": 1024,
+    "provenance": "Concepto generado previamente para PAMPI, seleccionado de entregas existentes",
+    "license_status": "Uso de concepto en este encargo; validar derechos de marca, fotografía y arte maestro antes de publicación",
+    "print_ready": false
+  },
+  {
+    "id": "tomate",
+    "path": "assets/tomate.jpg",
+    "source_path": "generated_images/exec-4c8149e1-02c8-4a03-97c7-3b92c3890750.png",
+    "sha256": "49b6c334cb8379908dde912ddcda7e505c5e66d78c5c5d89e7a6a08668a33052",
+    "width": 1536,
+    "height": 1024,
+    "provenance": "Mockup generado 23/10/2026 tras corrección expresa de Juan: tomate pelado en lata metálica; sustituye el concepto anterior en frasco.",
+    "license_status": "Uso de concepto en este encargo; validar derechos de marca, fotografía y arte maestro antes de publicación",
+    "print_ready": false
+  },
+  {
+    "id": "aceitunas",
+    "path": "assets/aceitunas.jpg",
+    "source_path": "output/pampi_etiquetas/ancla_passata/03_aceitunas.png",
+    "sha256": "a4342a9f05a84d675df3cd68b24e935becb9a71cdd3fff2b3517fa0907b94788",
+    "width": 1536,
+    "height": 1024,
+    "provenance": "Concepto generado previamente para PAMPI, seleccionado de entregas existentes",
+    "license_status": "Uso de concepto en este encargo; validar derechos de marca, fotografía y arte maestro antes de publicación",
+    "print_ready": false
+  },
+  {
+    "id": "conservas",
+    "path": "assets/conservas.jpg",
+    "source_path": "output/pampi_etiquetas/ancla_passata/04_conservas.png",
+    "sha256": "790aede00b0c57da204d014230b77cc9cea1af7c87925b95d29bd44a1e66e947",
+    "width": 1536,
+    "height": 1024,
+    "provenance": "Concepto generado previamente para PAMPI, seleccionado de entregas existentes",
+    "license_status": "Uso de concepto en este encargo; validar derechos de marca, fotografía y arte maestro antes de publicación",
+    "print_ready": false
+  },
+  {
+    "id": "quesos",
+    "path": "assets/quesos.jpg",
+    "source_path": "output/pampi_etiquetas/ancla_passata/quesos_delft_hero.png",
+    "sha256": "41134c55290c78a88786b0e6605ad62d97a821f898119b8e0725416fccc426fd",
+    "width": 1800,
+    "height": 600,
+    "provenance": "Concepto generado previamente para PAMPI, seleccionado de entregas existentes",
+    "license_status": "Uso de concepto en este encargo; validar derechos de marca, fotografía y arte maestro antes de publicación",
+    "print_ready": false
+  },
+  {
+    "id": "quesos-detalle",
+    "path": "assets/quesos-detalle.jpg",
+    "source_path": "output/pampi_etiquetas/ancla_passata/quesos_delft_detalle.png",
+    "sha256": "ee31fce26bb8f53820ec6fe290d3a2ae81ae8ba55fb1e8789ee36abb3becb1e9",
+    "width": 1800,
+    "height": 600,
+    "provenance": "Concepto generado previamente para PAMPI, seleccionado de entregas existentes",
+    "license_status": "Uso de concepto en este encargo; validar derechos de marca, fotografía y arte maestro antes de publicación",
+    "print_ready": false
+  },
+  {
+    "id": "mallas",
+    "path": "assets/mallas.jpg",
+    "source_path": "output/pampi_etiquetas/ampliacion/baby_quesos_malla.png",
+    "sha256": "685f40baa4a2752717c5fa44a14f0d05c1df24e53fc6f4a6283cdcc6af353bdf",
+    "width": 1774,
+    "height": 887,
+    "provenance": "Concepto generado previamente para PAMPI, seleccionado de entregas existentes",
+    "license_status": "Uso de concepto en este encargo; validar derechos de marca, fotografía y arte maestro antes de publicación",
+    "print_ready": false
+  },
+  {
+    "id": "mixes",
+    "path": "assets/mixes.jpg",
+    "source_path": "output/pampi_etiquetas/ampliacion/seis_mixes.png",
+    "sha256": "ed76be7387a8eb7ef9c6db42b275b5ceb4b5d04571d2bde58ca1541cabbf3c36",
+    "width": 1536,
+    "height": 1024,
+    "provenance": "Concepto generado previamente para PAMPI, seleccionado de entregas existentes",
+    "license_status": "Uso de concepto en este encargo; validar derechos de marca, fotografía y arte maestro antes de publicación",
+    "print_ready": false
+  },
+  {
+    "id": "tes",
+    "path": "assets/tes.jpg",
+    "source_path": "output/pampi_desarrollo/te_ampliado.png",
+    "sha256": "2937d191eecf07bf5f97a7bfe7c2047dd83737a7fcaeb761b024b71f39476722",
+    "width": 1536,
+    "height": 1024,
+    "provenance": "Concepto generado previamente para PAMPI, seleccionado de entregas existentes",
+    "license_status": "Uso de concepto en este encargo; validar derechos de marca, fotografía y arte maestro antes de publicación",
+    "print_ready": false
+  },
+  {
+    "id": "mermeladas",
+    "path": "assets/mermeladas.jpg",
+    "source_path": "output/pampi_etiquetas/ancla_passata/08_mermeladas.png",
+    "sha256": "96799fd7372d8d65fd7300589e7254f647b5fe340a41f08cf269467e6b724045",
+    "width": 1774,
+    "height": 887,
+    "provenance": "Concepto generado previamente para PAMPI, seleccionado de entregas existentes",
+    "license_status": "Uso de concepto en este encargo; validar derechos de marca, fotografía y arte maestro antes de publicación",
+    "print_ready": false
+  },
+  {
+    "id": "minis",
+    "path": "assets/minis.jpg",
+    "source_path": "output/pampi_etiquetas/ampliacion/mermeladas_minis.png",
+    "sha256": "5762abd484dfc0de4a143a465c1b9242939067fe76a2905b87b63de28e958de9",
+    "width": 1774,
+    "height": 887,
+    "provenance": "Concepto generado previamente para PAMPI, seleccionado de entregas existentes",
+    "license_status": "Uso de concepto en este encargo; validar derechos de marca, fotografía y arte maestro antes de publicación",
+    "print_ready": false
+  },
+  {
+    "id": "minis-extra",
+    "path": "assets/minis-extra.jpg",
+    "source_path": "output/pampi_etiquetas/ampliacion/mermeladas_ampliacion.png",
+    "sha256": "e81333eaa6ae15143ae42f601c787752826413eb8fd76d7d97b90c413900d904",
+    "width": 1774,
+    "height": 887,
+    "provenance": "Concepto generado previamente para PAMPI, seleccionado de entregas existentes",
+    "license_status": "Uso de concepto en este encargo; validar derechos de marca, fotografía y arte maestro antes de publicación",
+    "print_ready": false
+  },
+  {
+    "id": "degustacion",
+    "path": "assets/degustacion.jpg",
+    "source_path": "output/pampi_etiquetas/ampliacion/mermeladas_degustacion.png",
+    "sha256": "0972f650b017ee5ffd10b7bc49dff2eabb1f55d7c29cf0d23836dca38ca6b101",
+    "width": 1774,
+    "height": 887,
+    "provenance": "Concepto generado previamente para PAMPI, seleccionado de entregas existentes",
+    "license_status": "Uso de concepto en este encargo; validar derechos de marca, fotografía y arte maestro antes de publicación",
+    "print_ready": false
+  }
+]

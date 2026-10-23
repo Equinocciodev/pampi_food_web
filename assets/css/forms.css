@@ -1,0 +1,90 @@
+/* PAMPI · forms.css — formularios de /contacto/ y /distribucion/ (docs/03 Inputs, docs/06).
+   Label siempre visible, requerido textual (*), error junto al campo y resumen enlazado.
+   Los estados no dependen solo del color: llevan texto y borde/ícono textual.
+   Contraste (calculado): texto #25271F/blanco 15.1:1 · rojo #AD1F24/blanco 7.0:1 ·
+   borde input #73786F/blanco 4.5:1 y /canvas 4.0:1 (mín. 3:1 UI) · Delft foco /canvas 10.2:1. */
+
+/* Honeypot: fuera de pantalla, fuera del orden de tabulación y oculto a lectores. */
+.hp-field { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+.inquiry-form { position: relative; }
+.inquiry-form .form-field { margin: 0 0 var(--s-24); }
+.inquiry-form label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: bold; }
+.inquiry-form .req { color: var(--brand-red); }
+
+.inquiry-form input:not([type="checkbox"]),
+.inquiry-form select,
+.inquiry-form textarea {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 13px;
+  border: var(--border-w) solid var(--input-border);
+  border-radius: var(--radius-button);
+  background: var(--white);
+  color: var(--text);
+}
+.inquiry-form textarea { min-height: 140px; resize: vertical; }
+.inquiry-form ::placeholder { color: var(--text-muted); opacity: 1; }
+.inquiry-form input:focus-visible,
+.inquiry-form select:focus-visible,
+.inquiry-form textarea:focus-visible { outline: var(--focus); outline-offset: 2px; }
+
+/* Error de campo: borde más grueso + texto (no solo color). */
+.inquiry-form [aria-invalid="true"] { border: 2px solid var(--brand-red); }
+.field-error {
+  margin: 6px 0 0;
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--brand-red);
+}
+.field-error::before { content: "Error: "; }
+
+/* Casilla de privacidad: objetivo táctil de 44px gracias a la etiqueta clicable. */
+.inquiry-form .form-check { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.inquiry-form .form-check label { flex: 1 1 0; min-width: 0; min-height: 44px; margin: 0; font-size: 16px; font-weight: normal; }
+.inquiry-form .form-check input { width: 24px; height: 24px; margin: 2px 0 0; flex: none; accent-color: var(--brand-red); }
+.inquiry-form .form-check .field-error { flex-basis: 100%; }
+
+/* Resumen de errores (recibe el foco). */
+.form-error-summary {
+  margin: 0 0 var(--s-24);
+  padding: var(--s-16) var(--s-24);
+  border: 2px solid var(--brand-red);
+  border-left-width: 8px;
+  border-radius: var(--radius-button);
+  background: var(--white);
+}
+.form-error-summary:focus-visible, .form-error-summary:focus { outline: var(--focus); outline-offset: 2px; }
+.form-error-summary h2 { margin: 0 0 var(--s-8); font-size: 22px; }
+.form-error-summary ul { margin: 0; padding-left: 20px; }
+.form-error-summary a {
+  display: inline-block;
+  padding-block: 10px;
+  color: var(--brand-red);
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.interest-badge { margin: 0 0 var(--s-24); }
+
+/* Mensaje de estado (role=status). Vacío = invisible, pero siempre en el DOM. */
+.form-feedback:empty { display: none; }
+.form-feedback {
+  margin-top: var(--s-24);
+  padding: var(--s-16);
+  border: var(--border-w) solid var(--input-border);
+  border-left-width: 8px;
+  border-radius: var(--radius-button);
+  background: var(--white);
+  color: var(--text);
+}
+.form-feedback[data-tone="success"] { border-color: var(--olive); background: var(--success-bg); }
+.form-feedback[data-tone="warning"] { border-color: var(--delft); }
+.form-feedback[data-tone="error"] { border-color: var(--brand-red); }
+
+.form-noscript { margin: 0 0 var(--s-16); font-weight: bold; }
+
+.inquiry-form [data-submit] { min-width: 200px; }
+.inquiry-form[aria-busy="true"] [data-submit] { cursor: progress; }
+@media (max-width: 767px) { .inquiry-form [data-submit] { width: 100%; } }

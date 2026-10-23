@@ -1,0 +1,42 @@
+[
+  {
+    "id": "aceites",
+    "name": "Aceites",
+    "image": "assets/aceites.jpg"
+  },
+  {
+    "id": "tomates",
+    "name": "Tomate y passata",
+    "image": "assets/passata.jpg"
+  },
+  {
+    "id": "aceitunas",
+    "name": "Aceitunas sin hueso",
+    "image": "assets/aceitunas.jpg"
+  },
+  {
+    "id": "conservas",
+    "name": "Atún y sardinas",
+    "image": "assets/conservas.jpg"
+  },
+  {
+    "id": "quesos",
+    "name": "Edam y Gouda",
+    "image": "assets/quesos.jpg"
+  },
+  {
+    "id": "frutos-secos",
+    "name": "Mixes de frutos secos",
+    "image": "assets/mixes.jpg"
+  },
+  {
+    "id": "tes-infusiones",
+    "name": "Tés e infusiones",
+    "image": "assets/tes.jpg"
+  },
+  {
+    "id": "mermeladas",
+    "name": "Mermeladas",
+    "image": "assets/mermeladas.jpg"
+  }
+]

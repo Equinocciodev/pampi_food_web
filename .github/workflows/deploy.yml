@@ -22,9 +22,22 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # Build PÚBLICO (nunca STAGING): solo referencias publicVisible + canPublish.
+      - name: Build público
+        run: node build/build.mjs
+      # Gates de publicación (DAT 01/02/03, SEO 01, NAV 01, PERF): falla si dist/ no es PÚBLICO
+      # o si aparece cualquier concepto no publicable. Las variantes WebP van versionadas en
+      # assets/img/derived/ (node build/images.mjs), así que el runner no necesita cwebp.
+      - name: Gates de publicación
+        run: node build/check.mjs --public
+      - name: Comprobar enlaces internos
+        run: node build/check-links.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: dist
       - id: deployment
         uses: actions/deploy-pages@v4
