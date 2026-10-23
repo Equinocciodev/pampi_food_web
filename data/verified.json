@@ -1,0 +1,40 @@
+{
+  "_nota": "Datos verificados por referencia, con su fuente documental. Transcritos de la etiqueta real de la passata (data/fuentes/etiqueta-passata.jpg) y del Registro Sanitario SACS (data/fuentes/registro-sanitario-A-178339.pdf). Solo se publican campos de este archivo; lo demás sigue pendiente.",
+  "PAM-ROJ-01": {
+    "denominacion": { "valor": "Puré de tomate (passata)", "fuente": "etiqueta; registro SACS" },
+    "marca": { "valor": "Pampi", "fuente": "etiqueta; registro SACS" },
+    "contenidoNeto": { "valor": "680 g", "fuente": "etiqueta; registro SACS" },
+    "ingredientes": { "valor": "Tomate, sal y acidulante (ácido cítrico).", "fuente": "etiqueta" },
+    "modoEmpleo": { "valor": "Lista para usar; puede consumirse tal cual o cocinada.", "fuente": "etiqueta" },
+    "conservacion": { "valor": "Manténgase en un lugar fresco y seco. Una vez abierto, mantener refrigerado y consumir en un máximo de 2 días.", "fuente": "etiqueta" },
+    "loteVencimiento": { "valor": "Ver tapa.", "fuente": "etiqueta" },
+    "envase": { "valor": "Vidrio sodocálcico transparente de alta resistencia. Tapa metálica con sello hermético de seguridad.", "fuente": "registro SACS" },
+    "elaboradoPor": { "valor": "ASSOPAF – Agroindustria Alimentaria SCA", "fuente": "etiqueta; registro SACS" },
+    "lugarFabricacion": { "valor": "Cercola, Italia", "fuente": "etiqueta; registro SACS" },
+    "paisOrigen": { "valor": "Italia", "fuente": "etiqueta" },
+    "importadoDistribuidoPor": { "valor": "Inversiones Malesi, C.A. · RIF J-31358448-7 · Av. José Asunción Rodríguez, Edif. Grupo Leiros, piso 1, of. 15, sector Conejeros, Porlamar, estado Nueva Esparta, Venezuela. Código postal 6301.", "fuente": "etiqueta" },
+    "registroSanitario": { "valor": "Reg. San. M.P.P.S. Nº A-178.339 (alimento importado). Emitido el 16/10/2026, vigente hasta el 16/10/2031.", "fuente": "registro SACS" },
+    "codigoBarras": { "valor": "7590401600006", "fuente": "etiqueta (código de barras impreso). La ficha técnica del paquete marca el GTIN como pendiente de asignación autorizada: confirmar antes de usarlo como GTIN en datos estructurados." },
+    "declaracionesFrontales": { "valor": ["Tomates 100% italianos", "Sin conservantes", "Lista para usar", "Hecho en Italia", "Tradición italiana en frasco"], "fuente": "etiqueta" },
+    "usosSugeridos": { "valor": ["Pastas", "Pizzas", "Sopas", "Guisos"], "fuente": "etiqueta («Ideal para tus recetas»)" },
+    "nutricion": {
+      "fuente": "etiqueta (Información Nutricional)",
+      "porcion": "¼ taza (60 g)",
+      "porcionesPorEnvase": "aprox. 11",
+      "filas": [
+        { "nutriente": "Calorías", "cantidad": "15", "vd": null },
+        { "nutriente": "Calorías de grasa", "cantidad": "0", "vd": null },
+        { "nutriente": "Grasa total", "cantidad": "0 g", "vd": "0 %" },
+        { "nutriente": "Grasa saturada", "cantidad": "0 g", "vd": "0 %", "sub": true },
+        { "nutriente": "Sodio", "cantidad": "45 mg", "vd": "2 %" },
+        { "nutriente": "Carbohidratos totales", "cantidad": "3 g", "vd": "1 %" },
+        { "nutriente": "Fibra dietética", "cantidad": "menos de 1 g", "vd": "2 %", "sub": true },
+        { "nutriente": "Azúcares", "cantidad": "3 g", "vd": null, "sub": true },
+        { "nutriente": "Proteínas", "cantidad": "1 g", "vd": "2 %" }
+      ],
+      "nota": "Porcentajes de Valor Diario basados en una dieta de 2.000 calorías, según la Norma Venezolana COVENIN 2952:1997. Sus valores diarios pueden ser mayores o menores según sus necesidades calóricas.",
+      "valoresReferencia": { "Grasa total": "64 g", "Carbohidratos totales": "310 g", "Proteínas": "45 g" },
+      "caloriasPorGramo": "Grasa 9 · Carbohidratos 4 · Proteínas 4"
+    }
+  }
+}
