@@ -198,6 +198,7 @@
   chips.forEach((chip) => {
     chip.addEventListener("click", () => {
       chips.forEach((c) => c.classList.toggle("is-active", c === chip));
+      chip.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
       const f = chip.dataset.filter;
       items.forEach((it, i) => {
         const show = f === "all" || it.dataset.cat === f;

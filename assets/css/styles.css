@@ -769,6 +769,9 @@ body::before {
   .step__body { margin-top: 6px; }
   .step h3 { font-size: 22px; margin-bottom: 4px; }
   .recipe__cols { grid-template-columns: 1fr; gap: 20px; }
+  .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-right: var(--gutter); }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex: none; white-space: nowrap; }
   .sheet { padding: 26px 18px; border-radius: 22px; }
   .nutri { font-size: 14px; }
   .nutri caption { font-size: 24px; }
