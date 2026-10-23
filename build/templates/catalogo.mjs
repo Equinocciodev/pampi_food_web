@@ -2,6 +2,34 @@
 import { breadcrumbs, productCard, familyCard } from '../layout.mjs';
 import { esc } from '../util.mjs';
 
+// Palabras que identifican un envase dentro del texto libre de envase_propuesto.
+const PACKAGING_WORDS = /\b(botella|frasco|lata|bolsa|caja|tarro|envase|sobre)s?\b/i;
+
+/**
+ * Envase propuesto en forma breve para la tarjeta: specification.packaging si existe; si no, el
+ * primer fragmento literal de envase_propuesto (technical-source.json) que nombra un envase,
+ * prefiriendo el que menciona la variante (p. ej. "frasco de boca ancha para coco").
+ * Si el expediente no nombra ningún envase, devuelve null (no se inventa).
+ */
+export function shortPackaging(p, ctx) {
+  if (typeof p.specification?.packaging === 'string' && p.specification.packaging.trim()) return p.specification.packaging.trim();
+  const text = ctx.data.technical(p.id)?.envase_propuesto;
+  if (typeof text !== 'string') return null;
+  const clauses = text.replace(/^[A-ZÁÉÍÓÚ]+ por [^:]+:\s*/, '').split(/[.;]\s*/).map((c) => c.trim()).filter((c) => PACKAGING_WORDS.test(c));
+  if (!clauses.length) return null;
+  const variant = String(ctx.data.technical(p.id)?.variante || p.name).toLowerCase();
+  const pick = clauses.find((c) => c.toLowerCase().includes(variant)) || clauses[0];
+  return pick.replace(/^./, (c) => c.toUpperCase());
+}
+
+/** Tarjeta de producto + envase propuesto breve (el distintivo lo pone productCard). */
+export function cardWithMeta(p, ctx, opts) {
+  const html = productCard(p, ctx, opts);
+  const pack = shortPackaging(p, ctx);
+  if (!pack) return html;
+  return html.replace(/(<\/h[2-6]>)/, `$1<span class="card-meta">Envase propuesto: ${esc(pack)}</span>`);
+}
+
 export const CATALOG_INTRO = 'Explora una colección en desarrollo para acompañar la cocina y la mesa. Cada presentación se está definiendo con nuestros proveedores.';
 const EMPTY_SEARCH = 'No encontramos esa combinación. Prueba otra búsqueda o selecciona todas las familias.';
 
@@ -40,7 +68,7 @@ export function results(ctx, products, { familyId = null, headingLevel = 'h2' } 
   const n = products.length;
   return `${toolbar(ctx, familyId)}
 <p class="result-count" id="result-count" role="status" aria-live="polite" data-label-one="${one}" data-label-many="${many}">${n} ${n === 1 ? one : many}</p>
-<ul class="grid" id="results" role="list" data-results${familyId ? ` data-family-page="${esc(familyId)}"` : ''}>${products.map((p) => productCard(p, ctx, { headingLevel })).join('')}</ul>
+<ul class="grid" id="results" role="list" data-results${familyId ? ` data-family-page="${esc(familyId)}"` : ''}>${products.map((p) => cardWithMeta(p, ctx, { headingLevel })).join('')}</ul>
 <p class="empty" id="no-results" hidden>${EMPTY_SEARCH}</p>`;
 }
 

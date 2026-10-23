@@ -1,3 +1,7 @@
 dist/
 .DS_Store
 node_modules/
+# Índice del buscador (Pagefind) y términos del autocompletado: se generan dentro de dist/
+# (ya ignorado); estas líneas evitan commitearlos si alguien ejecuta Pagefind sobre la raíz.
+/pagefind/
+/buscador/

@@ -17,6 +17,12 @@ export const OG_LOCALE = 'es_VE';
 //   node build/build.mjs            -> PÚBLICO (por defecto, el que se despliega)
 //   STAGING=1 node build/build.mjs  -> STAGING local (conceptos privados, noindex en todo)
 export const STAGING = process.env.STAGING === '1';
+
+// DECISIÓN DEL USUARIO (23/10/2026), distinta de la regla del paquete (docs/05: solo se publica lo
+// aprobado): el build PÚBLICO publica las 50 referencias como conceptos, cada una con el aviso
+// visible "En desarrollo". Con false se vuelve a la regla canPublish del paquete.
+export const PUBLISH_CONCEPTS = true;
+export const DEV_NOTICE = 'Presentación y especificaciones sujetas a validación con el proveedor.';
 export const MODE = STAGING ? 'staging' : 'public';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

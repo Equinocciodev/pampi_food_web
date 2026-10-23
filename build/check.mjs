@@ -7,8 +7,13 @@
 // Sale con código 1 si falla cualquiera de:
 //   DAT 01  50 IDs únicos, slugs únicos, 8 familias, familyId válido (vía loadData)
 //   DAT 02  todas las imágenes referenciadas existen (repo y dist) y su SHA256 coincide
-//   DAT 03  (PÚBLICO) ningún ID/slug/nombre de referencia no publicable aparece en dist/:
-//           HTML, índice de búsqueda, sitemap, JSON-LD, metadatos
+//   DAT 03  Decisión del usuario (23/10/2026): el PÚBLICO publica las 50 referencias como conceptos.
+//           Se exige: una ficha /producto/{slug}/ por referencia visible y cada ficha de concepto con
+//           el aviso visible "En desarrollo"; ningún precio/stock/Offer/availability en dist/; ningún
+//           dato comercial interno del expediente (MOQ, unidades por caja, cajas por pallet, Incoterm);
+//           "Pendiente de validar" nunca incluye un campo verificado; data/fuentes/ no se copia a dist/.
+//           Si PUBLISH_CONCEPTS vuelve a false, sigue exigiendo que ninguna referencia no publicable
+//           (ID/slug/nombre) aparezca en dist/.
 //   SEO 01  title/description/canonical/OG/lang, robots, sitemap, 404, JSON-LD sin Product/Offer
 //   NAV 01  enlaces internos (href/src/srcset) y URLs del sitemap resuelven a archivos
 //   PERF    width/height y alt en <img>, lazy salvo el hero, sin fuentes/CSS/JS externos,
@@ -214,6 +219,47 @@ export function runChecks({ expectStaging, quiet = false } = {}) {
       const m = r.match(/^\/producto\/([^/]+)\/$/);
       if (m && !data.visible.some((p) => p.slug === m[1])) err('DAT 03', `ficha publicada para un slug no publicable: ${r}`);
     }
+  }
+
+  // DAT 03 (ambos modos): fichas de concepto con aviso, sin datos comerciales, fuentes no copiadas.
+  if (data) {
+    const productFiles = new Map(htmlFiles.map((f) => [routeOf(f), f]).filter(([r]) => r.startsWith('/producto/')));
+    for (const p of data.visible) {
+      const r = `/producto/${p.slug}/`;
+      const f = productFiles.get(r);
+      if (!f) { err('DAT 03', `falta la ficha ${r} de ${p.id}`); continue; }
+      const txt = read.get(f);
+      if (p.status !== 'approved') {
+        const notice = txt.match(/<p class="dev-notice"[^>]*data-dev-notice[^>]*>([\s\S]*?)<\/p>/);
+        if (!notice || !/En desarrollo/i.test(notice[1].replace(/<[^>]+>/g, ''))) err('DAT 03', `${r}: la ficha de concepto no muestra el aviso "En desarrollo"`);
+        if (!/data-pagefind-meta="[^"]*estado:En desarrollo/.test(txt)) err('DAT 03', `${r}: falta data-pagefind-meta estado:En desarrollo`);
+      }
+      // "Pendiente de validar" nunca contiene algo que ya está en verified.json.
+      const v = data.verified.get(p.id) || {};
+      const covers = { fabricante: 'elaboradoPor', importador: 'importadoDistribuidoPor', origen_acreditado: 'paisOrigen', formula_ingredientes: 'ingredientes', nutricion: 'nutricion', peso_neto: 'contenidoNeto', conservacion: 'conservacion', GTIN: 'codigoBarras', registro_sanitario: 'registroSanitario' };
+      for (const m of txt.matchAll(/data-pending="([^"]+)"/g)) if (covers[m[1]] && v[covers[m[1]]]) err('DAT 03', `${r}: "${m[1]}" figura como pendiente pero está verificado`);
+      // Ficha verificada: solo para referencias con datos en verified.json y con todos sus campos.
+      const shown = new Set([...txt.matchAll(/data-verified="([^"]+)"/g)].map((m) => m[1]));
+      if (!Object.keys(v).length && (shown.size || /data-verified-section/.test(txt))) err('DAT 03', `${r}: muestra "Ficha verificada" sin datos en verified.json`);
+      for (const k of Object.keys(v)) if (k !== 'nutricion' && !shown.has(k)) err('DAT 03', `${r}: falta el dato verificado ${k}`);
+      if (v.nutricion && !/<table class="nutrition-table">[\s\S]*?<caption>/.test(txt)) err('DAT 03', `${r}: falta la tabla nutricional verificada`);
+    }
+    for (const [r] of productFiles) if (!data.visible.some((p) => r === `/producto/${p.slug}/`)) err('DAT 03', `ficha publicada para un slug no visible en este modo: ${r}`);
+  }
+  const visibleText = (txt) => unesc(txt.replace(/<script\b[\s\S]*?<\/script>/g, ' ').replace(/<[^>]+>/g, ' '));
+  for (const [f, txt] of read) {
+    const where = rel(f);
+    if (/"@type"\s*:\s*"(?:Offer|AggregateOffer|Product)"|"(?:price|priceCurrency|availability|offers)"\s*:|itemprop="(?:price|offers|availability|priceCurrency)"|schema\.org\/(?:InStock|OutOfStock|PreOrder|LimitedAvailability)/.test(txt)) {
+      err('DAT 03', `${where}: precio/Offer/availability en datos o marcado`);
+    }
+    if (f.endsWith('.html') && routeOf(f).startsWith('/producto/')) {
+      const t = visibleText(txt);
+      if (/\bprecios?\b|\bstock\b|\bdisponibilidad\b|\bincoterm\b|\bMOQ\b|unidades por caja|cajas por pallet|\bUSD\b|US\$|€|\bBs\.?\s?\d/i.test(t)) err('DAT 03', `${where}: texto de precio, stock o datos comerciales internos`);
+    }
+  }
+  for (const f of files) {
+    const r = rel(f);
+    if (/(^|\/)fuentes\//.test(r) || /etiqueta-passata\.jpg$|registro-sanitario-[^/]*\.pdf$|\.pdf$/i.test(r)) err('DAT 03', `dist/${r}: los documentos de data/fuentes/ no se publican`);
   }
 
   // ---------------- SEO 01 ----------------

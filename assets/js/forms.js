@@ -153,8 +153,22 @@ function initForm(form) {
   };
 
   // Revalidación en vivo tras el primer intento: el error desaparece al corregirlo.
-  form.addEventListener('change', (ev) => revalidate(ev.target));
-  form.addEventListener('focusout', (ev) => revalidate(ev.target));
+  // Si el blur llega por un clic (pointerdown en otro control), se revalida tras el clic:
+  // ocultar el mensaje desplaza el formulario y, hecho entre pointerdown y pointerup, el
+  // clic caería fuera del control (p. ej. la casilla de privacidad no se marcaba). QA 2026-10-23.
+  let pointerDown = false;
+  let deferred = null;
+  document.addEventListener('pointerdown', () => { pointerDown = true; }, true);
+  const releasePointer = () => {
+    pointerDown = false;
+    if (deferred) { const t = deferred; deferred = null; setTimeout(() => revalidate(t), 0); }
+  };
+  document.addEventListener('pointerup', releasePointer, true);
+  document.addEventListener('pointercancel', releasePointer, true);
+  // `change` de un campo de texto también llega con el blur, así que se difiere igual.
+  const revalidateSoon = (ev) => { if (pointerDown) deferred = ev.target; else revalidate(ev.target); };
+  form.addEventListener('change', revalidateSoon);
+  form.addEventListener('focusout', revalidateSoon);
   function revalidate(target) {
     if (!attempted || !target?.name || target === honeypot) return;
     const errs = validate(values(), { companyRequired });

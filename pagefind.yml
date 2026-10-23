@@ -1,0 +1,17 @@
+# Configuración de Pagefind (buscador global de la cabecera, assets/js/buscador.js).
+# La lee `npx -y pagefind@1.5.2 --site dist` desde la raíz del repo (npm run search y el
+# workflow de Pages), después del build. Solo se indexa el <main> de las páginas que
+# build/layout.mjs marca con data-pagefind-body (todas menos la 404 y la privacidad).
+# Esto deja fuera, además, lo que sea navegación aunque esté dentro de <main>.
+exclude_selectors:
+  - ".site-header"
+  - ".site-footer"
+  - ".skip-link"
+  - ".notice"
+  - ".crumbs"
+  - "#pampi-buscar"
+  - ".pfb"
+  - "main nav"
+  - "[data-catalog-search]"
+  - "form"
+  - "svg"

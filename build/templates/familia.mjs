@@ -13,7 +13,7 @@ export default function familia(ctx) {
     const visual = products.length === 0
       ? `<figure class="family-visual"><img src="${imageUrl(f.image)}" alt="Colección conceptual ${esc(f.name)}" width="${a.width}" height="${a.height}" decoding="async"><figcaption class="fine">Imagen de familia conceptual; no representa de forma exclusiva ninguna referencia.</figcaption></figure>`
       : '';
-    const body = `<section class="section">
+    const body = `<section class="section" data-pagefind-filter="familia:${esc(f.name)}">
   <div class="container">
     ${breadcrumbs([{ href: '/', label: 'Inicio' }, { href: '/productos/', label: 'Productos' }, { label: f.name }])}
     <p class="eyebrow">La despensa PAMPI</p>

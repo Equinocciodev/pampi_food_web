@@ -4,7 +4,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import {
   DATA_DIR, IMG_DIR, IMG_URL_BASE, EXPECTED_PRODUCTS, EXPECTED_FAMILIES, FAMILY_ORDER,
-  STATUS_ENUM, COVERAGE_ENUM, APPROVAL_FLAGS, SPEC_FIELDS,
+  STATUS_ENUM, COVERAGE_ENUM, APPROVAL_FLAGS, SPEC_FIELDS, PUBLISH_CONCEPTS,
 } from './config.mjs';
 
 function readJson(name) {
@@ -38,6 +38,7 @@ export function loadData({ staging }) {
   const families = readJson('families.json');
   const manifest = readJson('asset-manifest.json');
   const technical = readJson('technical-source.json');
+  const verifiedRaw = readJson('verified.json');
   const errors = [];
   const fail = (msg) => errors.push(msg);
 
@@ -112,6 +113,24 @@ export function loadData({ staging }) {
     fail('PAM-ROJ-02 (tomate pelado) debe ir en lata metálica');
   }
 
+  // Datos verificados (data/verified.json): solo IDs del catálogo y cada campo con su fuente.
+  const verified = new Map();
+  for (const [id, fields] of Object.entries(verifiedRaw || {})) {
+    if (id.startsWith('_')) continue;
+    if (!ids.has(id)) { fail(`verified.json: ${id} no existe en el catálogo`); continue; }
+    for (const [k, f] of Object.entries(fields || {})) {
+      if (!f || typeof f.fuente !== 'string' || !f.fuente.trim()) fail(`verified.json ${id}.${k}: falta "fuente"`);
+      if (k === 'nutricion') {
+        if (!Array.isArray(f.filas) || !f.filas.length) fail(`verified.json ${id}.nutricion: faltan filas`);
+        for (const r of f.filas || []) if (!r.nutriente || typeof r.cantidad !== 'string') fail(`verified.json ${id}.nutricion: fila incompleta`);
+      } else if (!(typeof f?.valor === 'string' && f.valor.trim()) && !(Array.isArray(f?.valor) && f.valor.length)) {
+        fail(`verified.json ${id}.${k}: "valor" vacío`);
+      }
+    }
+    verified.set(id, fields);
+  }
+  const technicalById = new Map((technical || []).map((t) => [t.referencia_interna, t]));
+
   if (errors.length) {
     const err = new Error(`Validación de datos fallida (${errors.length}):\n - ${errors.join('\n - ')}`);
     err.validation = errors;
@@ -120,13 +139,17 @@ export function loadData({ staging }) {
 
   const orderedFamilies = FAMILY_ORDER.map((id) => familiesById.get(id));
   // Orden editorial estable: el del JSON.
-  const visible = staging ? catalog.slice() : catalog.filter((p) => p.publicVisible === true && canPublish(p));
+  // PÚBLICO: por decisión del usuario (PUBLISH_CONCEPTS, ver config.mjs y README «Decisiones») se
+  // publican todas las referencias como conceptos "En desarrollo"; sin ella, solo las canPublish.
+  const visible = staging || PUBLISH_CONCEPTS ? catalog.slice() : catalog.filter((p) => p.publicVisible === true && canPublish(p));
 
   return {
     catalog,
     visible,
     families: orderedFamilies,
     familiesById,
+    verified,
+    technical: (id) => technicalById.get(id),
     asset: (ref) => assetsByPath.get(ref),
     stats: {
       products: catalog.length,

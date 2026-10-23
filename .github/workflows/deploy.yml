@@ -28,6 +28,12 @@ jobs:
       # Build PÚBLICO (nunca STAGING): solo referencias publicVisible + canPublish.
       - name: Build público
         run: node build/build.mjs
+      # Buscador global: índice Pagefind (versión fija) sobre dist/, antes de los gates y de subirlo.
+      # dist/pagefind/ no se commitea; se genera aquí en cada despliegue.
+      - name: Índice del buscador (Pagefind)
+        run: |
+          npx -y pagefind@1.5.2 --site dist
+          test -f dist/pagefind/pagefind.js
       # Gates de publicación (DAT 01/02/03, SEO 01, NAV 01, PERF): falla si dist/ no es PÚBLICO
       # o si aparece cualquier concepto no publicable. Las variantes WebP van versionadas en
       # assets/img/derived/ (node build/images.mjs), así que el runner no necesita cwebp.

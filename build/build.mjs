@@ -1,5 +1,6 @@
 // Generador estático PAMPI. Uso:
-//   node build/build.mjs            -> PÚBLICO (por defecto; el que se despliega)
+//   node build/build.mjs            -> PÚBLICO (por defecto; el que se despliega). Publica las 50
+//                                      referencias como conceptos "En desarrollo" (PUBLISH_CONCEPTS)
 //   STAGING=1 node build/build.mjs  -> STAGING local (50 conceptos, noindex en todo, sin sitemap)
 import fs from 'node:fs';
 import path from 'node:path';
@@ -14,6 +15,7 @@ import {
 import { responsiveImages } from './images.mjs';
 import { runChecks } from './check.mjs';
 import { normalize } from './util.mjs';
+import { prepararBuscador } from './buscador.mjs';
 
 import inicio from './templates/inicio.mjs';
 import catalogo from './templates/catalogo.mjs';
@@ -133,7 +135,8 @@ function main() {
       }
     }
   } else {
-    // DAT 03: ningún concepto no publicable aparece en el build público.
+    // DAT 03: ninguna referencia fuera de data.visible aparece en el build público (con
+    // PUBLISH_CONCEPTS = true son todas visibles; el resto de DAT 03 lo comprueba check.mjs).
     const hidden = data.catalog.filter((p) => !data.visible.includes(p));
     const leaks = [];
     for (const f of textFiles) {
@@ -153,6 +156,9 @@ function main() {
   console.log(`[pampi] modo ${MODE.toUpperCase()} · ${pages.length} páginas · ${index.length} referencias visibles de ${data.stats.products} · ${data.stats.families} familias · ${data.stats.assets} assets verificados · ${ms} ms`);
   console.log(`[pampi] salida: ${path.relative(ROOT, DIST_DIR)}/${STAGING ? ' (STAGING: no desplegar)' : ''}`);
   console.log(`[pampi] gates OK · ${report.summary}`);
+
+  // Buscador global: términos del autocompletado y, con PAGEFIND=1, índice Pagefind (build/buscador.mjs).
+  prepararBuscador({ distDir: DIST_DIR, data });
 }
 
 try {
