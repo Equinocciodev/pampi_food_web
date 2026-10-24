@@ -8,7 +8,7 @@
 //   d) estado de aprobaciones (approvalFlags)
 //   e) referencia interna y relacionados de la misma familia
 // Nunca se publica precio, stock, disponibilidad, Offer ni GTIN en datos estructurados.
-import { breadcrumbs } from '../layout.mjs';
+import { breadcrumbs, mediaBgStyle } from '../layout.mjs';
 import { imageUrl } from '../data.mjs';
 import { APPROVAL_FLAGS, DEV_NOTICE } from '../config.mjs';
 import { esc } from '../util.mjs';
@@ -50,6 +50,7 @@ const TECH_INTERNAL = ['validacion_barrera', 'frente', 'dorso', 'formato_cotizar
 // Datos comerciales/internos del expediente: NUNCA se publican (ni como pendientes).
 export const TECH_PRIVATE = ['unidades_caja', 'cajas_pallet', 'MOQ', 'precio_incoterm', 'evidencia', 'aprobacion', 'prioridad_desarrollo', 'estatus_alcance'];
 const TECH_META = ['referencia_interna', 'familia'];
+const OG_MIN_SIDE = 600;
 
 // c) Etiquetas de los campos "PENDIENTE…" y el campo de verified.json que, si existe, los cubre.
 const PENDING_LABELS = {
@@ -208,7 +209,7 @@ export default function producto(ctx) {
     <article class="pdp" data-pagefind-filter="familia:${esc(fam.name)}" data-pagefind-meta="${esc(pagefindMeta)}">
     <div class="detail">
       <figure class="detail-media">
-        <img src="${img}" alt="${esc(alt)}" width="${a.width}" height="${a.height}" fetchpriority="high" decoding="async">
+        <img src="${img}" alt="${esc(alt)}" width="${a.width}" height="${a.height}" fetchpriority="high" decoding="async"${mediaBgStyle(a)}>
         <figcaption class="fine">${esc(caption)}</figcaption>
       </figure>
       <div class="detail-copy">
@@ -239,6 +240,11 @@ ${relatedBlock}`;
       active: 'productos',
       pageType: 'product',
       ogType: 'website',
+      // og:image: el render propio de la referencia si es individual y tiene al menos 600 px de lado;
+      // si no (imagen de familia o recorte pequeño), la general de marca (seo.mjs).
+      ogImage: !familyView && Math.min(a.width, a.height) >= OG_MIN_SIDE
+        ? { url: img, width: a.width, height: a.height, alt }
+        : undefined,
       body,
     };
   });

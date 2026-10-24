@@ -1,7 +1,7 @@
 // Layout común: head, header, footer, skip link, breadcrumbs y componentes compartidos.
 import fs from 'node:fs';
 import path from 'node:path';
-import { HTML_LANG, IMG_DIR } from './config.mjs';
+import { HTML_LANG, IMG_DIR, ASSETS_DIR } from './config.mjs';
 import { headMeta } from './seo.mjs';
 import { esc } from './util.mjs';
 import { imageUrl } from './data.mjs';
@@ -79,6 +79,16 @@ export function breadcrumbs(items) {
   return `<nav class="crumbs" aria-label="Migas de pan"><ol>${lis}</ol></nav>`;
 }
 
+/**
+ * Fondo del recuadro de la imagen: los recortes por referencia (assets/img/productos/) llevan en el
+ * manifest el color de su propio fondo («background»), así el recuadro blanco no deja bandas de otro
+ * tono alrededor del cuadrado crema. Devuelve el atributo style o ''.
+ */
+export function mediaBgStyle(asset) {
+  const bg = asset?.background;
+  return typeof bg === 'string' && /^#[0-9A-F]{6}$/i.test(bg) ? ` style="background-color:${bg}"` : '';
+}
+
 /** Tarjeta de producto (catálogo, familia, relacionados). */
 export function productCard(p, ctx, { headingLevel = 'h3' } = {}) {
   const a = ctx.data.asset(p.primaryImage);
@@ -93,7 +103,7 @@ export function productCard(p, ctx, { headingLevel = 'h3' } = {}) {
   const h = headingLevel;
   return `<li class="card-item" data-slug="${esc(p.slug)}" data-family="${esc(p.familyId)}">
   <a class="card" href="/producto/${esc(p.slug)}/">
-    <span class="card-media"><img src="${imageUrl(p.primaryImage)}" alt="" width="${a.width}" height="${a.height}" loading="lazy" decoding="async"></span>
+    <span class="card-media"${mediaBgStyle(a)}><img src="${imageUrl(p.primaryImage)}" alt="" width="${a.width}" height="${a.height}" loading="lazy" decoding="async"></span>
     <span class="card-body">${badge}<${h} class="card-title">${esc(p.name)}</${h}>${note ? `<span class="fine">${esc(note)}</span>` : ''}<span class="card-link">Ver propuesta <span aria-hidden="true">→</span></span></span>
   </a>
 </li>`;
@@ -175,15 +185,28 @@ function pesoTitulos(body) {
     (_, tag, a) => `<${tag}${a} data-pagefind-weight="${tag === 'h1' ? 9 : 6}">`);
 }
 
+// CSS crítico en línea: main.css (y forms.css en las páginas con formulario) va en un <style> del
+// <head> en vez de un <link> que bloquea el render (Lighthouse, 23/10/2026: ~150 ms en móvil). Son
+// ~5 KB comprimidos por hoja; solo se quitan comentarios y sangrías, el CSS es el mismo archivo.
+const inlineCache = new Map();
+function inlineCss(href) {
+  if (!inlineCache.has(href)) {
+    const css = fs.readFileSync(path.join(ASSETS_DIR, href.replace(/^\/assets\//, '')), 'utf8');
+    if (/<\/style|@import|url\(/i.test(css)) throw new Error(`${href}: no se puede incrustar (contiene </style, @import o url())`);
+    const min = css.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\n\s+/g, '\n').replace(/\n{2,}/g, '\n').trim();
+    inlineCache.set(href, `<style data-href="${href}">${min}</style>`);
+  }
+  return inlineCache.get(href);
+}
+
 /**
  * Página completa.
  * @param {object} ctx  contexto de build ({staging, data})
- * @param {object} o    {title, description, path, route, active, body, noindex, styles[], scripts[]}
+ * @param {object} o    {title, description, path, route, active, body, noindex, styles[], scripts[], ogImage}
  */
 export function page(ctx, o) {
   const noindex = ctx.staging || o.noindex === true;
-  const styles = ['/assets/css/main.css', ...(o.styles || [])]
-    .map((href) => `<link rel="stylesheet" href="${href}">`).join('\n');
+  const styles = ['/assets/css/main.css', ...(o.styles || [])].map(inlineCss).join('\n');
   const scripts = ['/assets/js/site.js', ...(o.scripts || [])]
     .map((src) => `<script type="module" src="${src}"></script>`).join('\n');
   const notice = ctx.staging
@@ -196,7 +219,7 @@ export function page(ctx, o) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-${headMeta({ title: o.title, description: o.description, path: o.path, noindex, ogType: o.ogType })}
+${headMeta({ title: o.title, description: o.description, path: o.path, noindex, ogType: o.ogType, ogImage: o.ogImage })}
 <meta name="theme-color" content="${THEME_COLOR}">
 <link rel="icon" href="/assets/img/marca/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/assets/img/marca/favicon-32.png" sizes="32x32">

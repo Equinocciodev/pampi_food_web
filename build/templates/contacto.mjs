@@ -1,5 +1,5 @@
 // Plantilla Contacto (/contacto/): consulta general y proveedores. Copy literal de app.js.
-import { inquiryForm } from './_inquiry-form.mjs';
+import { inquiryForm, FORM_ENABLED } from './_inquiry-form.mjs';
 import { breadcrumbs } from '../layout.mjs';
 
 export function contactBody({ distribution }) {
@@ -19,7 +19,7 @@ export function contactBody({ distribution }) {
       <h1>${h1}</h1>
       <p class="intro">${intro}</p>
       <p>Indica los productos de tu interés y tu ciudad. La información comercial y las presentaciones se confirmarán antes de cualquier acuerdo.</p>
-      <p class="fine">En esta vista de diseño no se envían datos. El canal de atención y la política de privacidad deben aprobarse antes del lanzamiento.</p>
+      ${FORM_ENABLED ? '' : '<p class="fine">En esta vista de diseño no se envían datos. El canal de atención y la política de privacidad deben aprobarse antes del lanzamiento.</p>'}
     </div>
     ${inquiryForm({ distribution })}
   </div>

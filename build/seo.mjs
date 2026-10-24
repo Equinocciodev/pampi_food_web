@@ -1,10 +1,20 @@
 // SEO (docs/07): head meta, canonical absoluto, Open Graph, sitemap.xml, robots.txt y JSON-LD
-// (Organization + BreadcrumbList; nunca Product/Offer). Pendiente: og:image 1200x630 aprobada y
-// lastmod real en el sitemap (no hay fecha de publicación fiable en los datos).
+// (Organization + BreadcrumbList; nunca Product/Offer). og:image: la general de marca 1200x630
+// (DEFAULT_OG_IMAGE) o la de la referencia en su ficha. Pendiente: lastmod real en el sitemap (no hay
+// fecha de publicación fiable en los datos).
 import fs from 'node:fs';
 import path from 'node:path';
 import { SITE_URL, SITE_NAME, OG_LOCALE } from './config.mjs';
 import { esc } from './util.mjs';
+
+// Imagen general para compartir (assets/img/marca/og-pampi.jpg): fondo crema, logo en rojo de marca y
+// la botella de passata. Composición propia a partir de assets del sitio; no es arte final aprobado.
+export const DEFAULT_OG_IMAGE = {
+  url: '/assets/img/marca/og-pampi.jpg',
+  width: 1200,
+  height: 630,
+  alt: 'Logo de Pampi en rojo junto a la botella de passata Pampi sobre fondo crema',
+};
 
 export function absoluteUrl(urlPath) {
   return new URL(urlPath, SITE_URL + '/').href;
@@ -17,8 +27,9 @@ export function absoluteUrl(urlPath) {
  * @param {string|null} o.path   ruta canónica ("/productos/"); null = sin canonical (404)
  * @param {boolean} o.noindex    true -> robots noindex,nofollow
  * @param {string} [o.ogType]    "website" por defecto
+ * @param {{url:string,width:number,height:number,alt:string}} [o.ogImage] imagen para compartir
  */
-export function headMeta({ title, description, path: urlPath, noindex, ogType = 'website' }) {
+export function headMeta({ title, description, path: urlPath, noindex, ogType = 'website', ogImage = DEFAULT_OG_IMAGE }) {
   const lines = [
     `<title>${esc(title)}</title>`,
     `<meta name="description" content="${esc(description)}">`,
@@ -33,7 +44,15 @@ export function headMeta({ title, description, path: urlPath, noindex, ogType = 
     `<meta property="og:description" content="${esc(description)}">`,
   );
   if (urlPath) lines.push(`<meta property="og:url" content="${esc(absoluteUrl(urlPath))}">`);
-  // og:image omitida a propósito: falta imagen 1200x630 aprobada (docs/07).
+  const img = ogImage || DEFAULT_OG_IMAGE;
+  lines.push(
+    `<meta property="og:image" content="${esc(absoluteUrl(img.url))}">`,
+    `<meta property="og:image:width" content="${img.width}">`,
+    `<meta property="og:image:height" content="${img.height}">`,
+    `<meta property="og:image:alt" content="${esc(img.alt)}">`,
+    '<meta name="twitter:card" content="summary_large_image">',
+    `<meta name="twitter:image:alt" content="${esc(img.alt)}">`,
+  );
   return lines.join('\n');
 }
 

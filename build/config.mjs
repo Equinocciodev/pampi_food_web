@@ -23,6 +23,16 @@ export const STAGING = process.env.STAGING === '1';
 // visible "En desarrollo". Con false se vuelve a la regla canPublish del paquete.
 export const PUBLISH_CONCEPTS = true;
 export const DEV_NOTICE = 'Presentación y especificaciones sujetas a validación con el proveedor.';
+// FORMULARIOS · único sitio donde se configura el destino de /contacto/ y /distribucion/.
+// null = envío deshabilitado (aviso honesto; no se transmite nada). Para activarlo, la URL del
+// formulario de Formspree: 'https://formspree.io/f/<id>' (ver README, «Formularios»). El build la
+// inyecta como data-endpoint en el <form> y falla si no tiene ese formato.
+export const FORM_ENDPOINT = null;
+export const FORM_ENDPOINT_RE = /^https:\/\/formspree\.io\/f\/[A-Za-z0-9]{6,32}$/;
+if (FORM_ENDPOINT !== null && !FORM_ENDPOINT_RE.test(FORM_ENDPOINT)) {
+  throw new Error(`FORM_ENDPOINT debe ser null o https://formspree.io/f/<id> (recibido: ${FORM_ENDPOINT})`);
+}
+
 export const MODE = STAGING ? 'staging' : 'public';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

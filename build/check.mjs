@@ -27,7 +27,7 @@ import { pathToFileURL } from 'node:url';
 import {
   DIST_DIR, IMG_DIR, SITE_URL, HTML_LANG, OG_LOCALE, SEARCH_INDEX_URL, EXPECTED_PRODUCTS, EXPECTED_FAMILIES,
 } from './config.mjs';
-import { loadData } from './data.mjs';
+import { loadData, imageFile } from './data.mjs';
 
 // Nombres de referencia que también son palabras del copy de marca aprobado (app.js / docs/04:
 // "passata" en el hero, "Edam y Gouda" en la sección de quesos, token de color "oliva" en CSS).
@@ -163,7 +163,7 @@ export function runChecks({ expectStaging, quiet = false } = {}) {
     // DAT 02: cada imagen referenciada existe en el repo y en dist/, con el mismo contenido.
     const refs = new Set([...data.catalog.map((p) => p.primaryImage), ...data.families.map((f) => f.image)]);
     for (const ref of refs) {
-      const name = path.basename(ref);
+      const name = imageFile(ref) || path.basename(ref);
       const src = path.join(IMG_DIR, name);
       const out = path.join(DIST_DIR, 'assets', 'img', name);
       if (!exists(src)) { err('DAT 02', `falta ${ref} en assets/img/`); continue; }
@@ -293,6 +293,16 @@ export function runChecks({ expectStaging, quiet = false } = {}) {
       for (const p of ['title', 'description', 'type', 'url', 'site_name']) if (!og(p)) err('SEO 01', `${where}: falta og:${p}`);
       if (og('url') && og('url') !== expected) err('SEO 01', `${where}: og:url ≠ canonical`);
       if (og('locale') !== OG_LOCALE) err('SEO 01', `${where}: og:locale debe ser ${OG_LOCALE}`);
+      const ogImg = og('image');
+      if (!ogImg) err('SEO 01', `${where}: falta og:image`);
+      else if (!ogImg.startsWith(`${SITE_URL}/`)) err('SEO 01', `${where}: og:image no es absoluta a SITE_URL (${ogImg})`);
+      else if (!exists(path.join(DIST_DIR, new URL(ogImg).pathname))) err('SEO 01', `${where}: og:image no existe en dist/ (${ogImg})`);
+      const ogW = Number(og('image:width'));
+      const ogH = Number(og('image:height'));
+      if (!ogW || !ogH) err('SEO 01', `${where}: og:image sin width/height`);
+      else if (Math.min(ogW, ogH) < 600) err('SEO 01', `${where}: og:image de ${ogW}x${ogH} (< 600 px)`);
+      if (!og('image:alt')) err('SEO 01', `${where}: og:image sin alt`);
+      if (!/<meta name="twitter:card" content="summary_large_image">/.test(txt)) err('SEO 01', `${where}: falta twitter:card summary_large_image`);
       if (!noindex) indexable.add(expected);
     }
     // JSON-LD: válido y sin schema comercial.

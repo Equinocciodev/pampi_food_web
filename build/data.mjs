@@ -17,9 +17,10 @@ function readJson(name) {
 }
 
 // "assets/aceites.jpg" -> nombre de archivo en assets/img/
-function imageFile(ref) {
-  if (typeof ref !== 'string' || !ref.startsWith('assets/')) return null;
-  return path.basename(ref);
+export function imageFile(ref) {
+  // "assets/<archivo>.jpg" (familias) o "assets/productos/<id>.jpg" (renders por referencia).
+  if (typeof ref !== 'string' || !/^assets\/(?:productos\/)?[a-z0-9-]+\.jpg$/.test(ref)) return null;
+  return ref.slice('assets/'.length);
 }
 
 export function imageUrl(ref) {

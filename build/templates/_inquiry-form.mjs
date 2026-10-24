@@ -1,9 +1,14 @@
 // Markup compartido del formulario de consulta (contacto y distribución).
 // Campos y límites: docs/06. Copy: app.js. El comportamiento (validación, estados, envío)
 // vive en assets/js/forms.js; aquí solo el markup accesible.
-// No hay destino aprobado: el formulario no tiene action y el botón se genera deshabilitado,
-// de modo que sin JS no puede enviarse nada (ni siquiera a la propia página estática).
-// forms.js lo habilita y, mientras FORM_ENDPOINT sea null, no transmite datos.
+// Destino: FORM_ENDPOINT de build/config.mjs, inyectado como data-endpoint (sin atributo si es null).
+// El formulario no tiene action y el botón se genera deshabilitado, de modo que sin JS no se envía
+// nada. forms.js lo habilita; con data-endpoint envía a Formspree y sin él muestra el aviso de envío
+// no habilitado. Honeypot: «_gotcha», el nombre que Formspree descarta.
+import { FORM_ENDPOINT } from '../config.mjs';
+import { esc } from '../util.mjs';
+
+export const FORM_ENABLED = FORM_ENDPOINT !== null;
 
 const REASONS = [
   ['consulta', 'Consulta general'],
@@ -24,7 +29,7 @@ export function inquiryForm({ distribution }) {
     ${input}
     <p class="field-error" id="f-${id}-error" hidden></p>
   </div>`;
-  return `<form class="inquiry-form" id="inquiry-form" method="post" novalidate data-inquiry-form data-form-type="${distribution ? 'distribucion' : 'contacto'}" aria-describedby="form-required-note">
+  return `<form class="inquiry-form" id="inquiry-form" method="post" novalidate data-inquiry-form data-form-type="${distribution ? 'distribucion' : 'contacto'}"${FORM_ENABLED ? ` data-endpoint="${esc(FORM_ENDPOINT)}"` : ''} aria-describedby="form-required-note">
   <p class="fine" id="form-required-note">Los campos marcados con * son obligatorios.</p>
   <div class="form-error-summary" id="form-error-summary" tabindex="-1" hidden></div>
   <p class="badge interest-badge" data-interest hidden></p>
@@ -36,15 +41,15 @@ export function inquiryForm({ distribution }) {
   ${field('message', 'Mensaje', '<textarea id="f-message" name="message" required minlength="10" maxlength="2000" rows="6" placeholder="Cuéntanos qué necesitas. No incluyas información sensible." aria-describedby="f-message-error"></textarea>', true)}
   <div class="form-field form-check" data-field="privacy">
     <input id="f-privacy" type="checkbox" name="privacy" required aria-describedby="f-privacy-error">
-    <label for="f-privacy">He leído la <a href="/privacidad/">información de privacidad</a>. Entiendo que este formulario es una demostración y no transmite datos. ${req}</label>
+    <label for="f-privacy">He leído la <a href="/privacidad/">información de privacidad</a>. ${FORM_ENABLED ? '' : 'Entiendo que este formulario es una demostración y no transmite datos. '}${req}</label>
     <p class="field-error" id="f-privacy-error" hidden></p>
   </div>
   <div class="hp-field" aria-hidden="true">
-    <label for="f-website">No completes este campo</label>
-    <input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off">
+    <label for="f-gotcha">No completes este campo</label>
+    <input id="f-gotcha" name="_gotcha" type="text" tabindex="-1" autocomplete="off">
   </div>
-  <noscript><p class="form-noscript">Este formulario necesita JavaScript. El envío aún no está habilitado.</p></noscript>
-  <button type="submit" class="button" data-submit disabled>Probar formulario</button>
+  <noscript><p class="form-noscript">Este formulario necesita JavaScript.${FORM_ENABLED ? '' : ' El envío aún no está habilitado.'}</p></noscript>
+  <button type="submit" class="button" data-submit disabled>${FORM_ENABLED ? 'Enviar consulta' : 'Probar formulario'}</button>
   <div class="form-feedback" id="form-feedback" role="status" aria-live="polite"></div>
 </form>`;
 }

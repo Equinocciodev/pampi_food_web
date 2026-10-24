@@ -6,24 +6,28 @@
 // - Error junto a cada campo (aria-invalid + aria-describedby) y resumen enlazado con foco.
 // - Honeypot: si viene relleno no se envía nada.
 // - "Enviando" bloquea el doble envío; timeout sin afirmar que se envió.
-// - Ningún mensaje de éxito hasta una respuesta real 201 del backend.
+// - Ningún mensaje de éxito hasta una respuesta correcta de Formspree.
 //
-// NO HAY DESTINO APROBADO. Mientras FORM_ENDPOINT sea null no se transmite nada a ningún
-// servidor: se valida y se muestra un aviso honesto de que el envío aún no está habilitado.
-// No configurar correos, WhatsApp ni servicios de terceros por inferencia.
+// DESTINO: el atributo data-endpoint del <form>, que el build inyecta desde FORM_ENDPOINT de
+// build/config.mjs (único sitio donde se configura). Solo se acepta https://formspree.io/f/<id>.
+// Sin data-endpoint (FORM_ENDPOINT = null) no se transmite nada a ningún servidor: se valida y se
+// muestra un aviso honesto de que el envío aún no está habilitado.
 
-/** URL del endpoint aprobado (p. ej. '/api/inquiries'). null = envío deshabilitado. */
-export const FORM_ENDPOINT = null;
 export const FORM_TIMEOUT_MS = 15000;
+export const FORMSPREE_RE = /^https:\/\/formspree\.io\/f\/[A-Za-z0-9]{6,32}$/;
 
 const REASONS = ['consulta', 'productos', 'distribucion', 'proveedores', 'prensa'];
+const REASON_LABELS = {
+  consulta: 'Consulta general', productos: 'Productos', distribucion: 'Distribución', proveedores: 'Proveedores', prensa: 'Prensa',
+};
 // Validación pragmática; el servidor hace la definitiva.
 const EMAIL_RE = /^[^\s@<>()[\]\\,;:"]+@[^\s@<>()[\]\\,;:"]+\.[^\s@<>()[\]\\,;:"]{2,}$/;
 
 const MSG = {
   unavailable: 'El envío aún no está habilitado. Tu consulta no se ha enviado ni guardado: el canal de atención está pendiente de aprobación. Los datos siguen en el formulario.',
-  success: (id) => `Hemos recibido tu consulta${id ? `. Referencia: ${id}` : ''}. Te responderemos por correo electrónico.`,
+  success: 'Hemos recibido tu consulta. Te responderemos por correo electrónico.',
   rate: 'Has enviado varias consultas en poco tiempo. Espera unos minutos e inténtalo de nuevo.',
+  network: 'No hemos podido conectar para enviar tu consulta. Revisa tu conexión: tus datos siguen en el formulario.',
   generic: 'No hemos podido enviar tu consulta. Tus datos siguen en el formulario; inténtalo de nuevo más tarde.',
   timeout: 'La conexión tardó demasiado y no podemos confirmar que tu consulta se haya enviado. Tus datos siguen en el formulario.',
   errors: (n) => (n === 1 ? 'El formulario tiene 1 error. Revisa el campo indicado.' : `El formulario tiene ${n} errores. Revisa los campos indicados.`),
@@ -33,6 +37,42 @@ const MSG = {
  * Valida los valores (ya recortados). Devuelve [{field, message}] en orden del formulario.
  * Exportada para poder probarla en Node.
  */
+/** Endpoint del formulario si es una URL de Formspree válida; si no, null (envío deshabilitado). */
+export function endpointOf(form) {
+  const url = form?.dataset?.endpoint || '';
+  return FORMSPREE_RE.test(url) ? url : null;
+}
+
+/**
+ * Campos que se envían a Formspree (FormData). «email» es el que Formspree usa como reply-to;
+ * «_subject» es el asunto del aviso (con el motivo) y «_gotcha» el honeypot que Formspree descarta.
+ * Exportada para poder probarla en Node.
+ */
+export function formspreeFields(v, { formType, sku = null, page = '', gotcha = '' } = {}) {
+  const reason = REASON_LABELS[v.reason] || v.reason;
+  const origin = formType === 'distribucion' ? 'Distribución' : 'Contacto';
+  const fields = {
+    name: v.name,
+    email: v.email,
+    company: v.company || '',
+    city: v.city,
+    reason,
+    message: v.message,
+    privacy: 'Aceptada',
+    form: origin,
+    _subject: `PAMPI · ${reason} · ${v.name}`.slice(0, 200),
+    _gotcha: gotcha,
+  };
+  if (sku) fields.sku = sku;
+  if (page) fields.page = page;
+  return fields;
+}
+
+// Mensajes propios (en español) para los errores de campo que devuelva Formspree.
+const FIELD_MSG = {
+  email: 'Escribe un correo electrónico válido, por ejemplo nombre@empresa.com.',
+};
+
 export function validate(v, { companyRequired = false } = {}) {
   const errs = [];
   const add = (field, message) => errs.push({ field, message });
@@ -52,19 +92,17 @@ export function validate(v, { companyRequired = false } = {}) {
   return errs;
 }
 
-const newKey = () => (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`);
-
 function initForm(form) {
   const companyRequired = form.dataset.formType === 'distribucion';
   const submit = form.querySelector('[data-submit]');
   const summary = form.querySelector('#form-error-summary');
   const feedback = form.querySelector('#form-feedback');
-  const honeypot = form.querySelector('input[name="website"]');
+  const honeypot = form.querySelector('input[name="_gotcha"]');
+  const endpoint = endpointOf(form);
   const label = submit.textContent;
   const control = (name) => form.elements.namedItem(name);
   let sending = false;
   let attempted = false;
-  let idempotencyKey = newKey();
 
   // Con JS el botón queda operativo (sin JS se queda deshabilitado: no hay destino).
   submit.disabled = false;
@@ -180,46 +218,47 @@ function initForm(form) {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), FORM_TIMEOUT_MS);
     const sku = form.querySelector('[data-interest]')?.dataset.sku || null;
-    const payload = {
-      name: v.name, email: v.email, company: v.company || null, city: v.city,
-      reason: v.reason, message: v.message, privacyAccepted: true,
-      formType: form.dataset.formType, sku,
-    };
+    const fd = new FormData();
+    const fields = formspreeFields(v, {
+      formType: form.dataset.formType, sku, page: location.pathname, gotcha: honeypot?.value || '',
+    });
+    for (const [k, val] of Object.entries(fields)) fd.append(k, val);
     try {
-      const res = await fetch(FORM_ENDPOINT, {
+      // FormData + Accept: sin cabeceras propias, la petición no necesita preflight CORS.
+      const res = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'Idempotency-Key': idempotencyKey },
-        body: JSON.stringify(payload),
-        credentials: 'same-origin',
+        headers: { Accept: 'application/json' },
+        body: fd,
+        credentials: 'omit',
         signal: ctrl.signal,
       });
       let body = null;
       try { body = await res.json(); } catch { body = null; }
-      if (res.status === 201) {
-        idempotencyKey = newKey();
+      if (res.ok && body?.ok !== false) {
         form.reset();
         attempted = false;
         clearErrors();
-        // El ID se muestra como texto (nunca como HTML).
-        setFeedback(MSG.success(typeof body?.id === 'string' ? body.id.slice(0, 64) : ''), 'success');
+        setFeedback(MSG.success, 'success');
         setState('success');
         return;
       }
-      if ((res.status === 400 || res.status === 422) && body && typeof body.errors === 'object') {
-        const errs = Object.entries(body.errors)
-          .filter(([f]) => control(f))
-          .map(([field, message]) => ({ field, message: String(message) }));
+      // Formspree: {errors: [{field?, code, message}]} (400/422). Los de campo se pintan junto a
+      // él con un texto propio; los de formulario (inactivo, no encontrado…) dan el aviso genérico.
+      if (Array.isArray(body?.errors)) {
+        const errs = body.errors
+          .filter((e) => e && typeof e.field === 'string' && control(e.field) && e.field !== '_gotcha')
+          .map((e) => ({ field: e.field, message: FIELD_MSG[e.field] || 'Revisa este campo.' }));
         if (errs.length) { showErrors(errs); return; }
       }
       setFeedback(res.status === 429 ? MSG.rate : MSG.generic, 'error');
       setState('error');
     } catch (err) {
       if (err?.name === 'AbortError') {
-        // Se conserva la misma Idempotency-Key para que un reintento no duplique la consulta.
         setFeedback(MSG.timeout, 'error');
         setState('timeout');
       } else {
-        setFeedback(MSG.generic, 'error');
+        // Sin red, bloqueado o error CORS: no se puede confirmar el envío.
+        setFeedback(MSG.network, 'error');
         setState('error');
       }
     } finally {
@@ -245,7 +284,7 @@ function initForm(form) {
       return;
     }
 
-    if (!FORM_ENDPOINT) {
+    if (!endpoint) {
       setFeedback(MSG.unavailable, 'warning');
       setState('unavailable');
       return;

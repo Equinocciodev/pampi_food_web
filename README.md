@@ -19,7 +19,7 @@ assets/
   css/main.css           tokens de docs/03, layout y componentes
   css/forms.css          estilos de formulario (campos, errores, resumen, estados)
   js/site.js             menú móvil, búsqueda/filtro del catálogo, consulta precargada con ?sku=
-  js/forms.js            validación y estados de formularios (FORM_ENDPOINT = null: no envía)
+  js/forms.js            validación, estados y envío a Formspree (destino en build/config.mjs)
   js/buscador.js         buscador global de la cabecera (Pagefind; ver «Buscador»)
   css/buscador.css       ventana del buscador (se carga sin bloquear el render)
   img/                   imágenes conceptuales del paquete (mismos nombres)
@@ -103,6 +103,7 @@ Hay dos buscadores. El de `/productos/` (y las familias) filtra la colección po
 
 - **Logo oficial:** `assets/img/marca/logo-pampi.svg`, el vector trazado de la etiqueta real (`fill="currentColor"`). Sustituye al logotipo tipográfico provisional del paquete. `build/layout.mjs` lo incrusta en línea para que herede el color: rojo de marca (`--brand-red`) en la cabecera, a 30 px de alto en móvil y 38 px desde 768. El pie reutiliza el mismo trazo con `<use href="#pampi-logo-trazo">` (el HTML no lleva el vector dos veces), a 56 px de alto. Como el pie es crema, el logo va en rojo; sobre un fondo rojo u oscuro bastaría `color: #fff` en el enlace. Lleva `role="img"`, `aria-label="Pampi, inicio"` y `<title>`.
 - **Favicon:** `favicon.svg` (la «P» del logo sobre rojo de marca), `favicon-32.png`, `apple-touch-icon.png` (180) e `icon-512.png`, todos en `assets/img/marca/`. Se copian a `dist/` con el resto de `assets/img/`. El `<head>` de cada página enlaza el SVG, el PNG de 32 y el apple-touch-icon, y lleva `<meta name="theme-color" content="#F6F2E7">` (el crema de la cabecera). No se usan tomates como favicon.
+- **Imagen para compartir (og:image):** `assets/img/marca/og-pampi.jpg`, 1200×630: fondo crema `#F6F2E7`, el logo SVG en rojo de marca y la botella de passata (`assets/img/passata.jpg`). Composición propia, pendiente de aprobación. `build/seo.mjs` (`DEFAULT_OG_IMAGE`) la pone en todas las páginas con `og:image`, `og:image:width/height/alt`, `twitter:card` `summary_large_image` y `twitter:image:alt`. Las fichas con render individual de al menos 600 px de lado usan el de la referencia (`build/templates/producto.mjs`); las de imagen de familia, la general. `build/check.mjs` exige og:image absoluta, existente, ≥ 600 px y con alt.
 
 ## Despliegue
 
@@ -146,35 +147,29 @@ Para Pagefind, el `<article class="pdp">` de cada ficha lleva `data-pagefind-fil
 
 - Validación en cliente con los límites de docs/06: nombre (obligatorio, 100 como máximo), correo (obligatorio, válido, 254 como máximo), empresa (150 como máximo y obligatoria en distribución), ciudad/país (obligatorio, 100 como máximo), motivo (enum), mensaje (entre 10 y 2000) y aceptación de la información de privacidad.
 - Cada error aparece junto a su campo, con `aria-invalid` y `aria-describedby`. Encima del formulario sale un resumen con enlaces que recibe el foco. El conteo de errores y los avisos se anuncian en una región `role="status"` (`aria-live="polite"`). No se usa `alert()`.
-- El honeypot (`website`) está oculto y fuera del orden de tabulación. Si llega relleno, no se envía nada.
-- Estados (`data-state` del `<form>`): idle, validating, sending, success, error, timeout y unavailable. Mientras envía, el botón muestra "Enviando", lleva `aria-disabled` y bloquea un segundo envío. El timeout es de 15 s y avisa sin afirmar que la consulta se envió. Cada envío lleva una cabecera `Idempotency-Key`, que se conserva si hay que reintentar.
-- **No hay destino aprobado.** `FORM_ENDPOINT = null` (en `assets/js/forms.js`): el formulario valida y muestra un aviso honesto de que el envío aún no está habilitado. No transmite ni guarda datos, y nunca simula un éxito. Sin JavaScript, el botón se genera deshabilitado y un `<noscript>` lo explica, así que tampoco hay POST a la página estática.
+- El honeypot (`_gotcha`, el nombre que Formspree descarta) está oculto y fuera del orden de tabulación. Si llega relleno, no se envía nada.
+- Estados (`data-state` del `<form>`): idle, validating, sending, success, error, timeout y unavailable. Mientras envía, el botón muestra "Enviando", lleva `aria-disabled` y bloquea un segundo envío. El timeout es de 15 s y avisa sin afirmar que la consulta se envió.
 
-Qué necesita el backend antes de poner `FORM_ENDPOINT` (docs/06):
+### Destino: Formspree
 
-1. Decisiones aprobadas: destinatario comercial, remitente transaccional verificado, proveedor de correo, plazo de retención, responsable legal, texto de privacidad público con revisión legal, origen permitido y política anti-spam. No configurar correos ni WhatsApp por inferencia.
-2. `POST /api/inquiries` con JSON `{name, email, company, city, reason, message, privacyAccepted, formType, sku}` y cabecera `Idempotency-Key`. Respuestas:
-   - `201 {id, status: "received"}`;
-   - `400/422 {errors: {campo: mensaje}}` (el cliente los pinta junto a cada campo);
-   - `429` cuando se supera el límite;
-   - `500` con un mensaje genérico.
-3. Validación en servidor además de la del cliente:
-   - trim y normalización;
-   - límites y enum;
-   - rechazo de HTML y de CRLF peligrosos (evita la inyección de cabeceras);
-   - escapar los datos al renderizarlos.
-4. Seguridad:
-   - rate limit y honeypot en servidor;
-   - CAPTCHA solo si hace falta y se aprueba;
-   - CSRF según la sesión y la arquitectura;
-   - CORS restringido al origen del sitio;
-   - HTTPS;
-   - CSP restrictiva que permita `connect-src` al endpoint;
-   - ningún secreto en el frontend;
-   - logs sin el contenido completo del mensaje;
-   - nada de correo abierto.
-5. No pedir cédula, datos bancarios, documentos ni adjuntos. El consentimiento de marketing va aparte, es opcional, va desmarcado y queda fuera de la fase 1.
-6. Al activarlo, revisar el copy de demostración: la casilla dice "Entiendo que este formulario es una demostración y no transmite datos", el botón dice "Probar formulario" (docs/04 propone "Enviar consulta") y está el párrafo "En esta vista de diseño no se envían datos".
+El destino se configura en **un único sitio**: `FORM_ENDPOINT` en `build/config.mjs`. El build lo inyecta como atributo `data-endpoint` en el `<form>` y `forms.js` lo lee de ahí.
+
+- **`FORM_ENDPOINT = null` (hoy).** No hay `data-endpoint`: el formulario valida y muestra el aviso honesto de que el envío aún no está habilitado. No transmite ni guarda datos y nunca simula un éxito. Sin JavaScript, el botón se genera deshabilitado y un `<noscript>` lo explica.
+- **`FORM_ENDPOINT = 'https://formspree.io/f/<id>'`.** `forms.js` hace `POST` con `fetch` a esa URL, con `FormData` y la cabecera `Accept: application/json` (sin cabeceras propias, así que no hay preflight CORS). Campos que llegan a Formspree: `name`, `email` (Formspree lo usa como reply-to), `company`, `city`, `reason` (la etiqueta legible), `message`, `privacy`, `form` (Contacto o Distribución), `sku` (si se llegó con `?sku=`), `page`, `_subject` (`PAMPI · <motivo> · <nombre>`) y `_gotcha`. Respuestas:
+  - `2xx` con `ok`: mensaje de éxito y formulario vacío;
+  - `400/422` con `errors[]` de Formspree: los errores con `field` se pintan junto al campo (con texto propio en español); los de formulario (inactivo, no encontrado…) dan el aviso genérico;
+  - `429`: aviso de demasiados envíos;
+  - error de red o CORS: aviso de conexión, sin afirmar que se envió; timeout de 15 s: aviso de timeout.
+- Cualquier otro valor hace fallar el build (`FORM_ENDPOINT_RE`).
+
+Cómo poner el ID:
+
+1. En Formspree, crear el formulario con el correo destinatario aprobado y copiar su endpoint (`https://formspree.io/f/abcdwxyz`). En los ajustes del formulario: restringir el dominio a `pampifood.com`, dejar activa la protección anti-spam y **desactivar reCAPTCHA** (con reCAPTCHA activo Formspree rechaza los envíos por AJAX).
+2. En `build/config.mjs`: `export const FORM_ENDPOINT = 'https://formspree.io/f/abcdwxyz';`
+3. `npm run build:all` y `node build/check.mjs --public`. Al activar el destino, el build quita solo el copy de demostración (la frase de la casilla de privacidad, el párrafo "En esta vista de diseño no se envían datos" y el texto del `<noscript>`) y el botón pasa de "Probar formulario" a "Enviar consulta".
+4. Enviar una consulta de prueba desde el sitio publicado y confirmarla en el panel de Formspree.
+
+Antes de activarlo siguen haciendo falta decisiones (docs/06): destinatario comercial, plazo de retención, responsable legal y el texto de `/privacidad/` revisado (hoy es el del prototipo y debe mencionar a Formspree como encargado del tratamiento). No pedir cédula, datos bancarios, documentos ni adjuntos. El consentimiento de marketing va aparte, es opcional, va desmarcado y queda fuera de la fase 1.
 
 ## Decisiones
 
@@ -188,11 +183,15 @@ Qué necesita el backend antes de poner `FORM_ENDPOINT` (docs/06):
 - [x] Logo vectorial: el trazado de la etiqueta real (`assets/img/marca/logo-pampi.svg`) en cabecera y pie, con favicon de la «P» (ver «Marca»). Falta confirmar con Juan si existe un maestro de agencia que lo sustituya.
 - [ ] Datos alimentarios y técnicos por referencia (peso, ingredientes, alérgenos, nutrición, origen, vida útil, conservación, GTIN), validados por el responsable técnico.
 - [ ] Renders individuales para las referencias que hoy usan imagen de familia, y derechos de cada asset (RIGHTS 01).
-- [ ] Destino aprobado del formulario (endpoint, destinatario y remitente), seguridad (validación en servidor, rate limit, CSP) y estados reales. El cliente ya está implementado (ver «Formularios»); hoy no envía nada porque `FORM_ENDPOINT` es `null`.
+- [ ] ID de Formspree y destinatario aprobados. El cliente ya está listo para Formspree (ver «Formularios»); hoy no envía nada porque `FORM_ENDPOINT` es `null` en `build/config.mjs`.
 - [ ] Política de privacidad aprobada por revisión legal (`/privacidad/` muestra el texto del prototipo y es `noindex` hasta entonces).
-- [ ] Imagen OG 1200×630 aprobada; derivados AVIF/WebP con `srcset` 480/800/1200.
+- [ ] Aprobación de la imagen OG 1200×630 (`assets/img/marca/og-pampi.jpg`, composición propia con el logo y la botella de passata; las fichas con render individual ≥ 600 px usan el suyo). Derivados WebP con `srcset` 480/800/1200 hechos; AVIF no.
 - [ ] Confirmar el dominio final (pampifood.com o pampifoods.com).
 - [ ] QA completo: responsive 320/390/768/1024/1440, teclado, lector de pantalla, contraste, Lighthouse y CWV medidos. Los resultados se adjuntan y no se suponen. Primera pasada en Chromium real (responsive, teclado, axe, buscador, formularios, SEO): `QA_WEB.md`; quedan lector de pantalla, WebKit/Gecko y rendimiento.
 - [ ] Autorización específica de despliegue.
 
 No se incorporan analítica, WhatsApp, correo, mapas ni servicios de terceros sin una decisión aprobada.
+
+## Dominio
+
+El dominio definitivo es **pampifood.com** (decisión del usuario, 23/10/2026). La etiqueta de la passata y los PDF de catálogo dicen «pampifoods.com»: Juan debe corregir la etiqueta.

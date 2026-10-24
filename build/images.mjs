@@ -1,4 +1,6 @@
-// Imágenes responsivas: variantes WebP 480/800/1200 de cada JPEG del manifest (docs/07).
+// Imágenes responsivas: variantes WebP 320/480/800/1200 de cada JPEG del manifest (docs/07), más una
+// al ancho original cuando es menor de 1200 y no coincide con esos anchos (los recortes por
+// referencia miden 436-1086 px): así el srcset nunca obliga a ampliar una variante más pequeña.
 //
 //   node build/images.mjs   -> genera/actualiza assets/img/derived/<nombre>-<ancho>.webp
 //
@@ -11,8 +13,16 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { IMG_DIR, IMG_URL_BASE, DATA_DIR } from './config.mjs';
+import { imageFile } from './data.mjs';
 
-export const WIDTHS = [480, 800, 1200];
+export const WIDTHS = [320, 480, 800, 1200];
+
+/** Anchos de variante para un original de `width` px: los de WIDTHS que caben y el propio ancho. */
+export function widthsFor(width) {
+  const out = WIDTHS.filter((w) => !width || w <= width);
+  if (width && width < WIDTHS.at(-1) && !WIDTHS.includes(width)) out.push(width);
+  return out;
+}
 export const WEBP_QUALITY = 74;
 export const DERIVED_DIR = path.join(IMG_DIR, 'derived');
 export const DERIVED_URL_BASE = `${IMG_URL_BASE}derived/`;
@@ -34,8 +44,7 @@ export const variantFile = (jpgName, w) => `${base(jpgName)}-${w}.webp`;
 /** Variantes disponibles en disco para un JPEG (solo anchos < ancho original). */
 export function variantsFor(jpgName, originalWidth) {
   const out = [];
-  for (const w of WIDTHS) {
-    if (originalWidth && w > originalWidth) continue;
+  for (const w of widthsFor(originalWidth)) {
     const f = variantFile(jpgName, w);
     if (fs.existsSync(path.join(DERIVED_DIR, f))) out.push({ w, url: DERIVED_URL_BASE + f, file: f });
   }
@@ -58,9 +67,8 @@ function generate() {
   let made = 0;
   for (const a of manifest) {
     const jpg = path.basename(a.path);
-    const src = path.join(IMG_DIR, jpg);
-    for (const w of WIDTHS) {
-      if (w > a.width) continue;
+    const src = path.join(IMG_DIR, imageFile(a.path) || jpg);
+    for (const w of widthsFor(a.width)) {
       const outName = variantFile(jpg, w);
       expected.add(outName);
       const out = path.join(DERIVED_DIR, outName);
@@ -92,6 +100,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
 export function responsiveImages(html) {
   const imgRe = /<img\b[^>]*>/g;
   let eagerSeen = false;
+  let preload = '';
   let out = '';
   let last = 0;
   for (const m of html.matchAll(imgRe)) {
@@ -107,6 +116,7 @@ export function responsiveImages(html) {
         tag = tag.replace(/\s*\bfetchpriority="[^"]*"/, '').replace(/^<img\b/, '<img loading="lazy"');
       }
     }
+    const isHero = !lazy && !/\bloading="lazy"/.test(tag);
     let replacement = tag;
     const jm = src.startsWith(IMG_URL_BASE) && src.match(/\/([^/]+\.jpe?g)$/i);
     if (jm) {
@@ -122,10 +132,14 @@ export function responsiveImages(html) {
         }
         const srcset = variants.map((v) => `${v.url} ${v.w}w`).join(', ');
         replacement = `<picture><source type="image/webp" srcset="${srcset}" sizes="${sizes}">${tag}</picture>`;
+        // Preload de la imagen del hero (LCP): el navegador la pide antes de leer el CSS en línea.
+        if (isHero && !preload) preload = `<link rel="preload" as="image" type="image/webp" imagesrcset="${srcset}" imagesizes="${sizes}" fetchpriority="high">`;
       }
     }
     out += html.slice(last, m.index) + replacement;
     last = m.index + m[0].length;
   }
-  return out + html.slice(last);
+  out += html.slice(last);
+  // Va justo después del viewport, antes de los <style> en línea.
+  return preload ? out.replace(/(<meta name="viewport"[^>]*>)/, `$1\n${preload}`) : out;
 }
